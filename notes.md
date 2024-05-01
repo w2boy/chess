@@ -1,2 +1,2 @@
 "# My notes" 
-The notes are ready.
+The notes are ready!
