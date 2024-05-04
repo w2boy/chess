@@ -31,6 +31,8 @@ public class PieceMovesCalculator {
                 moves = rookMovesCalculator.pieceMoves(board, myPosition, pieceColor, type);
                 break;
             case PAWN:
+                PawnMovesCalculator pawnMovesCalculator = new PawnMovesCalculator();
+                moves = pawnMovesCalculator.pieceMoves(board, myPosition, pieceColor, type);
                 break;
         }
         return moves;
