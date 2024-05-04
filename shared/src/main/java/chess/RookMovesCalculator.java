@@ -23,9 +23,8 @@ public class RookMovesCalculator {
                 //If not the same team's color, it can move to that space but needs exit loop after.
                 // Otherwise, the piece blocks the path. (exit loop without adding move)
                 if (other_piece_color != pieceColor){
-                    ChessPosition startPosition = new ChessPosition(row, column);
                     ChessPosition endPosition = new ChessPosition(up, column);
-                    ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+                    ChessMove chessMove = new ChessMove(myPosition, endPosition, null);
                     moves.add(chessMove);
                     break;
                 }
@@ -35,9 +34,8 @@ public class RookMovesCalculator {
             }
             //If there is no piece add the position
             else {
-                ChessPosition startPosition = new ChessPosition(row, column);
                 ChessPosition endPosition = new ChessPosition(up, column);
-                ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+                ChessMove chessMove = new ChessMove(myPosition, endPosition, null);
                 moves.add(chessMove);
             }
         }
@@ -48,11 +46,11 @@ public class RookMovesCalculator {
             ChessPiece other_piece = board.getPiece(otherPosition);
             if (other_piece != null){
                 ChessGame.TeamColor other_piece_color = other_piece.pieceColor;
-                //If not the same team's color, it can move to that space. Otherwise, the piece blocks the path. (exit loop)
+                //If not the same team's color, it can move to that space but needs exit loop after.
+                // Otherwise, the piece blocks the path. (exit loop without adding move)
                 if (other_piece_color != pieceColor){
-                    ChessPosition startPosition = new ChessPosition(row, column);
                     ChessPosition endPosition = new ChessPosition(down, column);
-                    ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+                    ChessMove chessMove = new ChessMove(myPosition, endPosition, null);
                     moves.add(chessMove);
                     break;
                 }
@@ -62,9 +60,8 @@ public class RookMovesCalculator {
             }
             //If there is no piece add the position
             else {
-                ChessPosition startPosition = new ChessPosition(row, column);
                 ChessPosition endPosition = new ChessPosition(down, column);
-                ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+                ChessMove chessMove = new ChessMove(myPosition, endPosition, null);
                 moves.add(chessMove);
             }
         }
@@ -75,11 +72,11 @@ public class RookMovesCalculator {
             ChessPiece other_piece = board.getPiece(otherPosition);
             if (other_piece != null){
                 ChessGame.TeamColor other_piece_color = other_piece.pieceColor;
-                //If not the same team's color, it can move to that space. Otherwise, the piece blocks the path. (exit loop)
+                //If not the same team's color, it can move to that space but needs exit loop after.
+                // Otherwise, the piece blocks the path. (exit loop without adding move)
                 if (other_piece_color != pieceColor){
-                    ChessPosition startPosition = new ChessPosition(row, column);
                     ChessPosition endPosition = new ChessPosition(row, right);
-                    ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+                    ChessMove chessMove = new ChessMove(myPosition, endPosition, null);
                     moves.add(chessMove);
                     break;
                 }
@@ -89,9 +86,8 @@ public class RookMovesCalculator {
             }
             //If there is no piece add the position
             else {
-                ChessPosition startPosition = new ChessPosition(row, column);
                 ChessPosition endPosition = new ChessPosition(row, right);
-                ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+                ChessMove chessMove = new ChessMove(myPosition, endPosition, null);
                 moves.add(chessMove);
             }
         }
@@ -102,11 +98,11 @@ public class RookMovesCalculator {
             ChessPiece other_piece = board.getPiece(otherPosition);
             if (other_piece != null){
                 ChessGame.TeamColor other_piece_color = other_piece.pieceColor;
-                //If not the same team's color, it can move to that space. Otherwise, the piece blocks the path. (exit loop)
+                //If not the same team's color, it can move to that space but needs exit loop after.
+                // Otherwise, the piece blocks the path. (exit loop without adding move)
                 if (other_piece_color != pieceColor){
-                    ChessPosition startPosition = new ChessPosition(row, left);
                     ChessPosition endPosition = new ChessPosition(row, left);
-                    ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+                    ChessMove chessMove = new ChessMove(myPosition, endPosition, null);
                     moves.add(chessMove);
                     break;
                 }
@@ -116,12 +112,12 @@ public class RookMovesCalculator {
             }
             //If there is no piece add the position
             else {
-                ChessPosition startPosition = new ChessPosition(row, column);
                 ChessPosition endPosition = new ChessPosition(row, left);
-                ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+                ChessMove chessMove = new ChessMove(myPosition, endPosition, null);
                 moves.add(chessMove);
             }
         }
+
         return moves;
     }
 }
