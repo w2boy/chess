@@ -13,8 +13,12 @@ public class PieceMovesCalculator {
             case KING:
                 break;
             case QUEEN:
+                QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator();
+                moves = queenMovesCalculator.pieceMoves(board, myPosition, pieceColor, type);
                 break;
             case BISHOP:
+                BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator();
+                moves = bishopMovesCalculator.pieceMoves(board, myPosition, pieceColor, type);
                 break;
             case KNIGHT:
                 break;
