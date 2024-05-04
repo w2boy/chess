@@ -11,6 +11,8 @@ public class PieceMovesCalculator {
         Collection<ChessMove> moves = null;
         switch (type) {
             case KING:
+                KingMovesCalculator kingMovesCalculator = new KingMovesCalculator();
+                moves = kingMovesCalculator.pieceMoves(board, myPosition, pieceColor, type);
                 break;
             case QUEEN:
                 QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator();
@@ -21,6 +23,8 @@ public class PieceMovesCalculator {
                 moves = bishopMovesCalculator.pieceMoves(board, myPosition, pieceColor, type);
                 break;
             case KNIGHT:
+                KnightMovesCalculator knightMovesCalculator = new KnightMovesCalculator();
+                moves = knightMovesCalculator.pieceMoves(board, myPosition, pieceColor, type);
                 break;
             case ROOK:
                 RookMovesCalculator rookMovesCalculator = new RookMovesCalculator();
