@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -11,6 +12,7 @@ import java.util.Collection;
 public class ChessGame {
 
     private ChessBoard board = new ChessBoard();
+    private TeamColor currentTurnColor;
 
     public ChessGame() {
 
@@ -20,7 +22,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return currentTurnColor;
     }
 
     /**
@@ -29,7 +31,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        currentTurnColor = team;
     }
 
     /**
@@ -40,6 +42,21 @@ public class ChessGame {
         BLACK
     }
 
+    //My own helper function to just see if a piece can attack the king
+    public Collection<ChessPosition> spacesInDanger(ChessPosition startPosition) {
+        Collection<ChessPosition> endPositions = new ArrayList<>();
+        ChessPiece myPiece = this.board.getPiece(startPosition);
+
+        Collection<ChessMove> moves = myPiece.pieceMoves(this.board,startPosition);
+        for(ChessMove move : moves) {
+            ChessPosition endPosition = move.getEndPosition();
+            endPositions.add(endPosition);
+        }
+
+        return endPositions;
+    }
+
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -48,7 +65,20 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        ChessPiece myPiece = this.board.getPiece(startPosition);
+        TeamColor myColor = myPiece.getTeamColor();
+        if (myPiece == null) {
+            return null;
+        }
+        if (currentTurnColor != myColor) {
+            return moves;
+        }
+
+
+
+
+        return moves;
     }
 
     /**
