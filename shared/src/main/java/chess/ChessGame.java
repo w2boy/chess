@@ -98,7 +98,28 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //Find Team's King piece and add spaces the other team can attack to a collection.
+        Collection<ChessPosition> spacesInDanger = new ArrayList<>();
+        ChessPosition kingPosition = null;
+        for (int i=1; i<=8; i++) {
+            for (int j=1; j<=8; j++) {
+                ChessPiece piece = this.board.getPiece(new ChessPosition(i,j));
+                ChessPiece.PieceType pieceType = piece.getPieceType();
+                if ((pieceType == ChessPiece.PieceType.KING) && (piece.pieceColor == teamColor)){
+                    //Found current team's king location
+                    kingPosition = new ChessPosition(i,j);
+                }
+                if (piece.getTeamColor() != teamColor) {
+                    spacesInDanger.addAll(spacesInDanger(new ChessPosition(i,j)));
+                }
+            }
+        }
+        //Check if the kingPosition is in any spaces that the other team could attack.
+        if (spacesInDanger.contains(kingPosition)){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
