@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -57,6 +58,19 @@ public class ChessGame {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(board, chessGame.board) && currentTurnColor == chessGame.currentTurnColor;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, currentTurnColor);
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -68,12 +82,8 @@ public class ChessGame {
         Collection<ChessMove> moves = new ArrayList<ChessMove>();
         ChessPiece myPiece = this.board.getPiece(startPosition);
         TeamColor myColor = myPiece.getTeamColor();
-        if (myPiece == null) {
-            return null;
-        }
-        if (currentTurnColor != myColor) {
-            return moves;
-        }
+
+        Collection<ChessMove> valid_moves = myPiece.pieceMoves(this.board, startPosition);
         moves = myPiece.pieceMoves(this.board, startPosition);
 
         //The cloned board will remove the piece where it originally is and try to
@@ -86,10 +96,10 @@ public class ChessGame {
             clonedGame.board.addPiece(move.endPosition, myPiece);
             boolean inCheck = clonedGame.isInCheck(myColor);
             if (inCheck){
-                moves.remove(move);
+                valid_moves.remove(move);
             }
         }
-        return moves;
+        return valid_moves;
     }
 
     /**
@@ -99,6 +109,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+//        if (myPiece == null) {
+//            return null;
+//        }
+//        if (currentTurnColor != myColor) {
+//            return moves;
+//        }
         throw new RuntimeException("Not implemented");
     }
 
