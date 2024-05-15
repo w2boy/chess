@@ -127,16 +127,14 @@ public class ChessGame {
             ChessPiece.PieceType myType = myPiece.getPieceType();
             this.board.addPiece(move.startPosition, null);
             if (myType == ChessPiece.PieceType.PAWN && (endPosition.getRow() == 8 || endPosition.getRow() == 1)){
-                this.board.addPiece(move.endPosition, new ChessPiece(myColor, ChessPiece.PieceType.QUEEN));
-                this.board.addPiece(move.endPosition, new ChessPiece(myColor, ChessPiece.PieceType.BISHOP));
-                this.board.addPiece(move.endPosition, new ChessPiece(myColor, ChessPiece.PieceType.KNIGHT));
-                this.board.addPiece(move.endPosition, new ChessPiece(myColor, ChessPiece.PieceType.ROOK));
+                this.board.addPiece(move.endPosition, new ChessPiece(myColor, move.getPromotionPiece()));
             } else {
                 this.board.addPiece(move.endPosition, myPiece);
             }
         } else {
             throw new InvalidMoveException();
         }
+        this.currentTurnColor = (currentTurnColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
