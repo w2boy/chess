@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -11,12 +12,12 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-    public ChessPiece.PieceType type;
-    public ChessGame.TeamColor pieceColor;
+    private ChessGame.TeamColor pieceColor;
+    private ChessPiece.PieceType pieceType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
-        this.type = type;
+        this.pieceType = type;
     }
 
     /**
@@ -42,7 +43,7 @@ public class ChessPiece {
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return this.type;
+        return this.pieceType;
     }
 
     @Override
@@ -50,12 +51,12 @@ public class ChessPiece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPiece that = (ChessPiece) o;
-        return type == that.type && pieceColor == that.pieceColor;
+        return pieceType == that.pieceType && pieceColor == that.pieceColor;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, pieceColor);
+        return Objects.hash(pieceType, pieceColor);
     }
 
     /**
@@ -66,12 +67,40 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMovesCalculator move_calculator = new PieceMovesCalculator();
-        return move_calculator.pieceMoves(board, myPosition, this.pieceColor, this.type);
-    }
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece.PieceType myPieceType = getPieceType();
+
+        switch (myPieceType) {
+            case KING:
+                KingMovesCalculator kingMovesCalculator = new KingMovesCalculator();
+                moves = kingMovesCalculator.pieceMoves(board, myPosition);
+                break;
+            case QUEEN:
+                QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator();
+                moves = queenMovesCalculator.pieceMoves(board, myPosition);
+                break;
+            case ROOK:
+                RookMovesCalculator rookMovesCalculator = new RookMovesCalculator();
+                moves = rookMovesCalculator.pieceMoves(board, myPosition);
+                break;
+            case BISHOP:
+                BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator();
+                moves = bishopMovesCalculator.pieceMoves(board, myPosition);
+                break;
+            case KNIGHT:
+                KnightMovesCalculator knightMovesCalculator = new KnightMovesCalculator();
+                moves = knightMovesCalculator.pieceMoves(board,myPosition);
+                break;
+            case PAWN:
+                PawnMovesCalculator pawnMovesCalculator = new PawnMovesCalculator();
+                moves = pawnMovesCalculator.pieceMoves(board, myPosition);
+                break;
+        }
+
+        return moves;}
 
     @Override
     public String toString(){
-        return this.type.toString() + " " + this.pieceColor.toString();
+        return this.pieceType.toString() + " " + this.pieceColor.toString();
     }
 }

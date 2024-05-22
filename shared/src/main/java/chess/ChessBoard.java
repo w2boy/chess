@@ -73,20 +73,16 @@ public class ChessBoard implements Cloneable {
      */
     public void resetBoard() {
         //Place white pawns
-        for(int i=0; i<=7; i++){
-            ChessPiece [] whitePawns = new ChessPiece[8];
-            whitePawns[i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            ChessPosition [] whitePawnsPosition = new ChessPosition[8];
-            whitePawnsPosition[i] = new ChessPosition(2, i+1);
-            this.addPiece(whitePawnsPosition[i], whitePawns[i]);
+        for (int i=0; i <=7; i++){
+            ChessPiece p = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            ChessPosition pPos = new ChessPosition(2, i+1);
+            this.addPiece(pPos, p);
         }
         //Place black pawns
-        for(int i=0; i<=7; i++){
-            ChessPiece [] blackPawns = new ChessPiece[8];
-            blackPawns[i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            ChessPosition [] blackPawnsPosition = new ChessPosition[8];
-            blackPawnsPosition[i] = new ChessPosition(7, i+1);
-            this.addPiece(blackPawnsPosition[i], blackPawns[i]);
+        for (int i=0; i <=7; i++){
+            ChessPiece p = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            ChessPosition pPos = new ChessPosition(7, i+1);
+            this.addPiece(pPos, p);
         }
         //Place rest of white pieces
         //Rooks
