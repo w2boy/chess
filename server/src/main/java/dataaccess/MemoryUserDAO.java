@@ -24,4 +24,15 @@ public class MemoryUserDAO {
     public void createUser(UserData userData){
         users.add(userData);
     }
+
+    public UserData getUser(String username, String password){
+        for (UserData userData : users){
+            if (userData.username().equals(username)){
+                if (userData.password().equals(password)){
+                    return userData;
+                }
+            }
+        }
+        return null;
+    }
 }

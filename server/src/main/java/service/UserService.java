@@ -16,7 +16,12 @@ public class UserService {
         }
         return null;
     }
-    public AuthData login(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, UserData userData) {
+    public AuthData login(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, LoginRequest loginRequest) {
+        UserData existingUser = userDAO.getUser(loginRequest.username(), loginRequest.password());
+        if (existingUser != null){
+            AuthData authData = authDAO.createAuth(existingUser.username());
+            return authData;
+        }
         return null;
     }
     public void logout(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, UserData userData, AuthData authData) {}
