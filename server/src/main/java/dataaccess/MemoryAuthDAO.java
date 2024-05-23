@@ -19,4 +19,25 @@ public class MemoryAuthDAO {
         listOfAuthData.add(authData);
         return authData;
     }
+
+    public AuthData getAuth(String authToken){
+        for (AuthData authData : listOfAuthData){
+            if (authData.authToken().equals(authToken)){
+                return authData;
+            }
+        }
+        return null;
+    }
+
+    public void deleteAuth(String authToken){
+        AuthData authDataToDelete = null;
+        for (AuthData authData : listOfAuthData){
+            if (authData.authToken().equals(authToken)){
+                authDataToDelete = authData;
+            }
+        }
+        if (authDataToDelete != null){
+            listOfAuthData.remove(authDataToDelete);
+        }
+    }
 }

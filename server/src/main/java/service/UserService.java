@@ -24,5 +24,10 @@ public class UserService {
         }
         return null;
     }
-    public void logout(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, UserData userData, AuthData authData) {}
+    public void logout(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, String authToken) {
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData != null){
+            authDAO.deleteAuth(authToken);
+        }
+    }
 }
