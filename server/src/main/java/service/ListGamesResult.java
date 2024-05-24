@@ -2,5 +2,6 @@ package service;
 
 import model.GameData;
 
-record ListGamesResult(
+public record ListGamesResult(
+        String message,
         GameData[] listOfGameData) {}

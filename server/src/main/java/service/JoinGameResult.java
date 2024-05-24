@@ -1,4 +1,4 @@
 package service;
 
-record JoinGameResult(
-        ) {}
+public record JoinGameResult(
+        String message) {}

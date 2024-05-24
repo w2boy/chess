@@ -12,9 +12,10 @@ import java.util.ArrayList;
 
 public class ClearService {
 
-    public void clearAllData(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO) throws DataAccessException {
+    public ClearResult clearAllData(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO) throws DataAccessException {
         authDAO.deleteAllAuthData();
         userDAO.deleteAllUsers();
         gameDAO.deleteAllGames();
+        return new ClearResult(null);
     }
 }

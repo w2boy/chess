@@ -2,5 +2,6 @@ package service;
 
 import model.GameData;
 
-record CreateGameResult(
+public record CreateGameResult(
+        String message,
         GameData gameData) {}

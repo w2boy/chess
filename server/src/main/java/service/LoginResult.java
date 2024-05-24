@@ -1,4 +1,6 @@
 package service;
 
-record LoginResult(
-        String username, String authToken) {}
+public record LoginResult(
+        String message,
+        String username,
+        String authToken) {}

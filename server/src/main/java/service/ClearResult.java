@@ -1,4 +1,3 @@
 package service;
 
-record ClearResult(
-        ) {}
+public record ClearResult  (String message) {}
