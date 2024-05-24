@@ -1,15 +1,19 @@
 package service;
 
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
 
 public class GameService {
-    public ListGamesResult listGames(AuthData authData) {
+    public ListGamesResult listGames(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, String authToken) throws DataAccessException {
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData != null){
+            return gameDAO.getListOfGames();
+        }
         return null;
     }
-    public CreateGameResult createGame(GameData gameData, AuthData authData) {
+    public CreateGameResult createGame(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, GameData gameData, String authToken) throws DataAccessException {
         return null;
     }
-    public JoinGameResult joinGame(GameData gameData, AuthData authData) {}
+    public JoinGameResult joinGame(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, GameData gameData, String authToken) throws DataAccessException {return null;}
 }

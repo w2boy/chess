@@ -2,6 +2,8 @@ package service;
 
 import model.GameData;
 
+import java.util.ArrayList;
+
 public record ListGamesResult(
         String message,
-        GameData[] listOfGameData) {}
+        ArrayList<GameData> games) {}
