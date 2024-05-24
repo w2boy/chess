@@ -25,7 +25,7 @@ public class MemoryGameDAO {
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
-        int gameID = games.size();
+        int gameID = games.size() + 1;
         ChessGame chessGame = new ChessGame();
         GameData gameData = new GameData (gameID, null, null, createGameRequest.gameName(), chessGame);
         games.add(gameData);

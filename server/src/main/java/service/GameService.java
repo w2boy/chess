@@ -17,7 +17,7 @@ public class GameService {
         if (authData != null){
             return gameDAO.createGame(createGameRequest);
         }
-        return null;
+        return new CreateGameResult("Error: unauthorized", null);
     }
     public JoinGameResult joinGame(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
         AuthData authData = authDAO.getAuth(authToken);

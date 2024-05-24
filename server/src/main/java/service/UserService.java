@@ -33,6 +33,6 @@ public class UserService {
             authDAO.deleteAuth(authToken);
             return new LogoutResult(null);
         }
-        return null;
+        return new LogoutResult("Error: unauthorized");
     }
 }
