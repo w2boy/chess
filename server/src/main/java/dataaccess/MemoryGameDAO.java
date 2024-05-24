@@ -33,22 +33,28 @@ public class MemoryGameDAO {
     }
 
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String username) throws DataAccessException {
+        if (joinGameRequest.playerColor() == null){
+            return new JoinGameResult("Error: bad request");
+        }
         int desiredGameID = joinGameRequest.gameID();
         for (GameData gameData : games){
             if (gameData.gameID() == desiredGameID){
-                if (joinGameRequest.playerColor().equals("WHITE")){
+                if (joinGameRequest.playerColor().equals("WHITE") && gameData.whiteUsername() == null){
                     GameData desiredGame = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
                     games.add(desiredGame);
                 }
-                else if (joinGameRequest.playerColor().equals("BLACK")){
+                else if (joinGameRequest.playerColor().equals("BLACK") && gameData.blackUsername() == null){
                     GameData desiredGame = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
                     games.add(desiredGame);
+                }
+                else {
+                    return new JoinGameResult("Error: already taken");
                 }
                 games.remove(gameData);
                 return new JoinGameResult(null);
             }
         }
 
-        return new JoinGameResult(null);
+        return new JoinGameResult("Error: bad request");
     }
 }
