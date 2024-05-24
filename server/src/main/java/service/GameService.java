@@ -19,5 +19,11 @@ public class GameService {
         }
         return null;
     }
-    public JoinGameResult joinGame(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, GameData gameData, String authToken) throws DataAccessException {return null;}
+    public JoinGameResult joinGame(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData != null){
+            return gameDAO.joinGame(joinGameRequest, authData.username());
+        }
+        return null;
+    }
 }
