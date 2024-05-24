@@ -12,7 +12,11 @@ public class GameService {
         }
         return null;
     }
-    public CreateGameResult createGame(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, GameData gameData, String authToken) throws DataAccessException {
+    public CreateGameResult createGame(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, String authToken, CreateGameRequest createGameRequest) throws DataAccessException {
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData != null){
+            return gameDAO.createGame(createGameRequest);
+        }
         return null;
     }
     public JoinGameResult joinGame(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO, GameData gameData, String authToken) throws DataAccessException {return null;}
