@@ -24,6 +24,6 @@ public class GameService {
         if (authData != null){
             return gameDAO.joinGame(joinGameRequest, authData.username());
         }
-        return null;
+        return new JoinGameResult("Error: unauthorized");
     }
 }
