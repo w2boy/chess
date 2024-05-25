@@ -5,6 +5,17 @@ import java.util.Collection;
 
 public class PawnMovesCalculator extends PieceMovesCalculator {
 
+    public Collection<ChessMove> addRestOfPromotionMoves(ChessPosition myPosition, ChessPosition otherPosition){
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessMove move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.ROOK);
+        moves.add(move);
+        move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.BISHOP);
+        moves.add(move);
+        move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.KNIGHT);
+        moves.add(move);
+        return moves;
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
@@ -29,12 +40,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
                 moves.add(move);
                 if (row+1 ==8){
                     ChessPosition otherPosition = new ChessPosition(row+1, column);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.ROOK);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.BISHOP);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.KNIGHT);
-                    moves.add(move);
+                    moves.addAll(addRestOfPromotionMoves(myPosition, otherPosition));
                 }
             }
             move = calculateMoveCapture(board, myPosition, row+1, column+1);
@@ -42,12 +48,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
                 moves.add(move);
                 if (row+1 ==8){
                     ChessPosition otherPosition = new ChessPosition(row+1, column+1);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.ROOK);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.BISHOP);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.KNIGHT);
-                    moves.add(move);
+                    moves.addAll(addRestOfPromotionMoves(myPosition, otherPosition));
                 }
             }
             move = calculateMoveCapture(board, myPosition, row+1, column-1);
@@ -55,12 +56,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
                 moves.add(move);
                 if (row+1==8){
                     ChessPosition otherPosition = new ChessPosition(row+1, column-1);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.ROOK);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.BISHOP);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.KNIGHT);
-                    moves.add(move);
+                    moves.addAll(addRestOfPromotionMoves(myPosition, otherPosition));
                 }
             }
         }
@@ -82,12 +78,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
                 moves.add(move);
                 if (row-1==1){
                     ChessPosition otherPosition = new ChessPosition(row-1, column);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.ROOK);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.BISHOP);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.KNIGHT);
-                    moves.add(move);
+                    moves.addAll(addRestOfPromotionMoves(myPosition, otherPosition));
                 }
             }
             move = calculateMoveCapture(board, myPosition, row-1, column+1);
@@ -95,12 +86,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
                 moves.add(move);
                 if (row-1==1){
                     ChessPosition otherPosition = new ChessPosition(row-1, column+1);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.ROOK);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.BISHOP);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.KNIGHT);
-                    moves.add(move);
+                    moves.addAll(addRestOfPromotionMoves(myPosition, otherPosition));
                 }
             }
             move = calculateMoveCapture(board, myPosition, row-1, column-1);
@@ -108,12 +94,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
                 moves.add(move);
                 if (row-1==1){
                     ChessPosition otherPosition = new ChessPosition(row-1, column-1);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.ROOK);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.BISHOP);
-                    moves.add(move);
-                    move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.KNIGHT);
-                    moves.add(move);
+                    moves.addAll(addRestOfPromotionMoves(myPosition, otherPosition));
                 }
             }
         }

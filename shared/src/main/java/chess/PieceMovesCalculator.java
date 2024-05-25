@@ -44,12 +44,7 @@ package chess;public class PieceMovesCalculator {
         if (otherPiece != null){
             return null;
         } else {
-            if (newRow == 8 || newRow == 1){
-                ChessMove move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.QUEEN);
-                return move;
-            }
-            ChessMove move = new ChessMove(myPosition, otherPosition, null);
-            return move;
+            return addPawnMove(newRow, myPosition, otherPosition);
         }
     }
 
@@ -64,18 +59,22 @@ package chess;public class PieceMovesCalculator {
             ChessPiece myPiece = board.getPiece(myPosition);
             ChessGame.TeamColor myColor = myPiece.getTeamColor();
             if (myColor != otherColor){
-                if (newRow == 8 || newRow == 1){
-                    ChessMove move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.QUEEN);
-                    return move;
-                }
-                ChessMove move = new ChessMove(myPosition, otherPosition, null);
-                return move;
+                return addPawnMove(newRow, myPosition, otherPosition);
             } else {
                 return null;
             }
         } else {
             return null;
         }
+    }
+
+    public ChessMove addPawnMove(int newRow, ChessPosition myPosition, ChessPosition otherPosition){
+        if (newRow == 8 || newRow == 1){
+            ChessMove move = new ChessMove(myPosition, otherPosition, ChessPiece.PieceType.QUEEN);
+            return move;
+        }
+        ChessMove move = new ChessMove(myPosition, otherPosition, null);
+        return move;
     }
 
 }
