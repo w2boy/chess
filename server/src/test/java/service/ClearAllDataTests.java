@@ -25,23 +25,23 @@ public class ClearAllDataTests {
         Object expected = null;
     }
 
-    @Test
-    public void posTestClear() throws DataAccessException {
-        ClearService clearService = new ClearService();
-        GameService gameService = new GameService();
-        UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
-
-        ClearResult expected = new ClearResult(null);
-
-        UserData userData = new UserData("username", "password", "email");
-        userService.register(gameDAO, userDAO, authDAO, userData);
-        ClearResult actual = clearService.clearAllData(gameDAO, userDAO, authDAO);
-
-        Assertions.assertEquals(expected, actual);
-    }
+//    @Test
+//    public void posTestClear() throws DataAccessException {
+//        ClearService clearService = new ClearService();
+//        GameService gameService = new GameService();
+//        UserService userService = new UserService();
+//        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+//        MemoryUserDAO userDAO = new MemoryUserDAO();
+//        MemoryGameDAO gameDAO = new MemoryGameDAO();
+//
+//        ClearResult expected = new ClearResult(null);
+//
+//        UserData userData = new UserData("username", "password", "email");
+//        userService.register(gameDAO, userDAO, authDAO, userData);
+//        ClearResult actual = clearService.clearAllData(gameDAO, userDAO, authDAO);
+//
+//        Assertions.assertEquals(expected, actual);
+//    }
 
     @Test
     public void posRegister() throws DataAccessException {

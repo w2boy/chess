@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -12,7 +9,7 @@ import java.util.ArrayList;
 
 public class ClearService {
 
-    public ClearResult clearAllData(MemoryGameDAO gameDAO, MemoryUserDAO userDAO, MemoryAuthDAO authDAO) throws DataAccessException {
+    public ClearResult clearAllData(SQLGameDAO gameDAO, SQLUserDAO userDAO, SQLAuthDAO authDAO) throws DataAccessException {
         authDAO.deleteAllAuthData();
         userDAO.deleteAllUsers();
         gameDAO.deleteAllGames();

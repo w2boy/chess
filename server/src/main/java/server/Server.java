@@ -1,9 +1,6 @@
 package server;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import service.*;
 import model.AuthData;
 import model.UserData;
@@ -20,6 +17,10 @@ public class Server {
     private MemoryAuthDAO authDAO = new MemoryAuthDAO();
     private MemoryUserDAO userDAO = new MemoryUserDAO();
     private MemoryGameDAO gameDAO = new MemoryGameDAO();
+
+    private SQLAuthDAO authSQLDAO = new SQLAuthDAO();
+    private SQLUserDAO userSQLDAO = new SQLUserDAO();
+    private SQLGameDAO gameSQLDAO = new SQLGameDAO();
 
     public Server(){
         this.clearService = new ClearService();
@@ -54,7 +55,7 @@ public class Server {
     }
 
     private Object clearAllData(Request req, Response res) throws DataAccessException {
-        ClearResult clearResult = clearService.clearAllData(gameDAO, userDAO, authDAO);
+        ClearResult clearResult = clearService.clearAllData(gameSQLDAO, userSQLDAO, authSQLDAO);
         res.status(200);
         return new Gson().toJson(clearResult);
     }
