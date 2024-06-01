@@ -75,8 +75,25 @@ public class SQLAuthDAO {
         return new AuthData(rs.getString("auth_token"), rs.getString("username"));
     }
 
-    public void deleteAuth(String authToken){
+    public void deleteAuth(String authToken) throws DataAccessException {
+        Connection connection = null;
 
+        try (var conn = DatabaseManager.getConnection()) {
+
+            connection = conn;
+
+            String sql = "delete from auth_table WHERE auth_token=?";
+
+            try(PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, authToken);
+                int count = stmt.executeUpdate();
+
+                // System.out.printf("Deleted %d authTokens\n", count);
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Error while deleting single auth data");
+        }
     }
 
 

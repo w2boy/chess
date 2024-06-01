@@ -2,6 +2,7 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -49,11 +50,12 @@ public class SQLUserDAO {
     }
 
     public void createUser(UserData userData) throws DataAccessException{
+        String hashedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "insert into user_table (username, password, email) values (?, ?, ?)";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, userData.username());
-                ps.setString(2, userData.password());
+                ps.setString(2, hashedPassword);
                 ps.setString(3, userData.email());
                 if(ps.executeUpdate() == 1) {
                     // Do Nothing
@@ -68,13 +70,16 @@ public class SQLUserDAO {
 
     public UserData getUser(String username, String password) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, password, email FROM user_table WHERE username=? AND password=?";
+            var statement = "SELECT username, password, email FROM user_table WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
-                ps.setString(2, password);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return readUser(rs);
+                        UserData userData = readUser(rs);
+                        if (BCrypt.checkpw(password, userData.password())){
+                            return userData;
+                        }
+                        return null;
                     }
                 }
             }
