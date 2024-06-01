@@ -18,8 +18,6 @@ public class Server {
     private MemoryUserDAO userDAO = new MemoryUserDAO();
     private MemoryGameDAO gameDAO = new MemoryGameDAO();
 
-
-
     private SQLAuthDAO authSQLDAO = new SQLAuthDAO();
     private SQLUserDAO userSQLDAO = new SQLUserDAO();
     private SQLGameDAO gameSQLDAO = new SQLGameDAO();
@@ -69,7 +67,7 @@ public class Server {
 
     private Object register(Request req, Response res) throws DataAccessException {
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
-        LoginResult loginResult = userService.register(gameDAO, userDAO, authDAO, userData);
+        LoginResult loginResult = userService.register(gameSQLDAO, userSQLDAO, authSQLDAO, userData);
         if (loginResult.message() != null){
             if (loginResult.message().equals("Error: bad request")){
                 res.status(400);
@@ -85,7 +83,7 @@ public class Server {
 
     private Object login(Request req, Response res) throws DataAccessException {
         LoginRequest loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
-        LoginResult loginResult  = userService.login(gameDAO, userDAO, authDAO, loginRequest);
+        LoginResult loginResult  = userService.login(gameSQLDAO, userSQLDAO, authSQLDAO, loginRequest);
         if (loginResult.message() != null){
             res.status(401);
         } else {
@@ -96,7 +94,7 @@ public class Server {
 
     private Object logout(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
-        LogoutResult logoutResult = userService.logout(gameDAO, userDAO, authDAO, authToken);
+        LogoutResult logoutResult = userService.logout(gameSQLDAO, userSQLDAO, authSQLDAO, authToken);
         if (logoutResult.message() != null){
             if (logoutResult.message().equals("Error: unauthorized")){
                 res.status(401);
