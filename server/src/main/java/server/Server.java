@@ -18,6 +18,8 @@ public class Server {
     private MemoryUserDAO userDAO = new MemoryUserDAO();
     private MemoryGameDAO gameDAO = new MemoryGameDAO();
 
+
+
     private SQLAuthDAO authSQLDAO = new SQLAuthDAO();
     private SQLUserDAO userSQLDAO = new SQLUserDAO();
     private SQLGameDAO gameSQLDAO = new SQLGameDAO();
@@ -28,7 +30,12 @@ public class Server {
         this.userService = new UserService();
     }
 
+    public void createDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+    }
+
     public int run(int desiredPort) {
+
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");

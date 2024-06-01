@@ -2,6 +2,7 @@ package dataaccess;
 
 import java.sql.*;
 import java.util.Properties;
+import java.util.ArrayList;
 
 public class DatabaseManager {
     private static final String DATABASE_NAME;
@@ -34,12 +35,57 @@ public class DatabaseManager {
     /**
      * Creates the database if it does not already exist.
      */
-    static void createDatabase() throws DataAccessException {
+    public static void createDatabase() throws DataAccessException {
         try {
-            var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
+            String statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
             var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+        createTables();
+    }
+
+    public static void createTables() throws DataAccessException {
+        String[] statements = {
+                """
+                CREATE TABLE IF NOT EXISTS auth_table (
+                  `auth_token` varchar(255) not null primary key,
+                  `username` varchar(255) not null
+                );
+                
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS user_table (
+                  `username` varchar(255) not null primary key unique,
+                  `password` varchar(255) not null,
+                  `email` varchar(255) not null
+                );
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS game_table (
+                  `game_id` int not null primary key unique,
+                  `white_username` varchar(255),
+                  `black_username` varchar(255),
+                  `game_name` varchar(255) not null,
+                  `game` LONGTEXT not null
+                );
+                
+                """
+        };
+        executeStatement(statements);
+
+    }
+
+    public static void executeStatement(String[] statements) throws DataAccessException {
+        try {
+            var conn = getConnection();
+            for (var statement : statements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
