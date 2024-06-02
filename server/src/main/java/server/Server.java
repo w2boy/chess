@@ -107,7 +107,7 @@ public class Server {
 
     private Object listGames(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
-        ListGamesResult listGamesResult = gameService.listGames(gameDAO, userDAO, authDAO, authToken);
+        ListGamesResult listGamesResult = gameService.listGames(gameSQLDAO, userSQLDAO, authSQLDAO, authToken);
         if (listGamesResult.message() != null){
             if (listGamesResult.message().equals("Error: unauthorized")){
                 res.status(401);
@@ -121,7 +121,7 @@ public class Server {
     private Object createGame(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
         CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
-        CreateGameResult createGameResult = gameService.createGame(gameDAO, userDAO, authDAO, authToken, createGameRequest);
+        CreateGameResult createGameResult = gameService.createGame(gameSQLDAO, userSQLDAO, authSQLDAO, authToken, createGameRequest);
         if (createGameResult.message() != null){
             if (createGameResult.message().equals("Error: unauthorized")){
                 res.status(401);
@@ -135,7 +135,7 @@ public class Server {
     private Object joinGame(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
         JoinGameRequest joinGameRequest = new Gson().fromJson(req.body(), JoinGameRequest.class);
-        JoinGameResult joinGameResult = gameService.joinGame(gameDAO, userDAO, authDAO, authToken, joinGameRequest);
+        JoinGameResult joinGameResult = gameService.joinGame(gameSQLDAO, userSQLDAO, authSQLDAO, authToken, joinGameRequest);
         if (joinGameResult.message() != null){
             if (joinGameResult.message().equals("Error: unauthorized")){
                 res.status(401);
