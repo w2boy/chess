@@ -13,6 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
 public class SQLGameDAO {
     private ArrayList<GameData> games = new ArrayList<>();
 
@@ -85,7 +87,48 @@ public class SQLGameDAO {
     }
 
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String username) throws DataAccessException {
-        return null;
+        String statement = "SELECT game_id, white_username, black_username, game_name, game FROM game_table WHERE game_id=?";
+        int desiredGameID = joinGameRequest.gameID();
+
+        if (!(joinGameRequest.playerColor().equals("WHITE") || joinGameRequest.playerColor().equals("BLACK"))) {
+            return new JoinGameResult("Error: bad request");
+        }
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, desiredGameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        GameData gameData = readGame(rs);
+                        if (!(joinGameRequest.playerColor().equals("WHITE") && gameData.whiteUsername() == null) &&
+                                !(joinGameRequest.playerColor().equals("BLACK") && gameData.blackUsername() == null)){
+                            return new JoinGameResult("Error: already taken");
+                        }
+                    }
+                }
+            }
+            if (joinGameRequest.playerColor().equals("WHITE")){
+                statement = "update game_table " +
+                        "set white_username=?" +
+                        "where game_id=?";
+            }
+            else if (joinGameRequest.playerColor().equals("BLACK")){
+                statement = "UPDATE game_table " +
+                        "SET black_username=?" +
+                        "WHERE game_id=?";
+            }
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                ps.setInt(2, desiredGameID);
+                if(ps.executeUpdate() == 1) {
+                    return new JoinGameResult(null);
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
+        }
+
+        return new JoinGameResult("Error: bad request");
     }
 
     private GameData readGame(ResultSet rs) throws SQLException {
