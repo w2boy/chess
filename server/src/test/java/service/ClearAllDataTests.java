@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.UserData;
 import model.GameData;
 import org.junit.jupiter.api.Assertions;
@@ -15,42 +12,43 @@ import java.util.ArrayList;
 public class ClearAllDataTests {
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() throws DataAccessException {
         GameService gameService = null;
         UserService userService = null;
-        ClearService clearService = null;
-        MemoryAuthDAO authDAO = null;
-        MemoryUserDAO userDAO = null;
-        MemoryGameDAO gameDAO = null;
+        ClearService clearService = new ClearService();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
         Object expected = null;
+        clearService.clearAllData(gameDAO, userDAO, authDAO );
     }
 
-//    @Test
-//    public void posTestClear() throws DataAccessException {
-//        ClearService clearService = new ClearService();
-//        GameService gameService = new GameService();
-//        UserService userService = new UserService();
-//        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-//        MemoryUserDAO userDAO = new MemoryUserDAO();
-//        MemoryGameDAO gameDAO = new MemoryGameDAO();
-//
-//        ClearResult expected = new ClearResult(null);
-//
-//        UserData userData = new UserData("username", "password", "email");
-//        userService.register(gameDAO, userDAO, authDAO, userData);
-//        ClearResult actual = clearService.clearAllData(gameDAO, userDAO, authDAO);
-//
-//        Assertions.assertEquals(expected, actual);
-//    }
+    @Test
+    public void posTestClear() throws DataAccessException {
+        ClearService clearService = new ClearService();
+        GameService gameService = new GameService();
+        UserService userService = new UserService();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+
+        ClearResult expected = new ClearResult(null);
+
+        UserData userData = new UserData("username", "password", "email");
+        userService.register(gameDAO, userDAO, authDAO, userData);
+        ClearResult actual = clearService.clearAllData(gameDAO, userDAO, authDAO);
+
+        Assertions.assertEquals(expected, actual);
+    }
 
     @Test
     public void posRegister() throws DataAccessException {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         LoginResult expected = new LoginResult(null, "username", "fac6d656-833c-4e48-870c-f3528160c418");
 
@@ -65,9 +63,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         LoginResult expected = new LoginResult("Error: already taken", null, null);
 
@@ -84,9 +82,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         LoginResult expected = new LoginResult(null, "username", "fac6d656-833c-4e48-870c-f3528160c418");
 
@@ -103,9 +101,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         LoginResult expected = new LoginResult("Error: unauthorized", null, null);
 
@@ -122,9 +120,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         LogoutResult expected = new LogoutResult(null);
 
@@ -143,9 +141,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         LogoutResult expected = new LogoutResult("Error: unauthorized");
 
@@ -166,9 +164,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         ArrayList<GameData> gamesToList = new ArrayList<>();
 
@@ -189,9 +187,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         ArrayList<GameData> gamesToList = new ArrayList<>();
 
@@ -216,9 +214,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         ArrayList<GameData> gamesToList = new ArrayList<>();
 
@@ -240,9 +238,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         ArrayList<GameData> gamesToList = new ArrayList<>();
 
@@ -266,9 +264,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         ArrayList<GameData> gamesToList = new ArrayList<>();
 
@@ -292,9 +290,9 @@ public class ClearAllDataTests {
         ClearService clearService = new ClearService();
         GameService gameService = new GameService();
         UserService userService = new UserService();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
 
         ArrayList<GameData> gamesToList = new ArrayList<>();
 
