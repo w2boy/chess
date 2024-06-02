@@ -14,10 +14,6 @@ public class Server {
     private GameService gameService;
     private UserService userService;
 
-    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private MemoryUserDAO userDAO = new MemoryUserDAO();
-    private MemoryGameDAO gameDAO = new MemoryGameDAO();
-
     private SQLAuthDAO authSQLDAO = new SQLAuthDAO();
     private SQLUserDAO userSQLDAO = new SQLUserDAO();
     private SQLGameDAO gameSQLDAO = new SQLGameDAO();
