@@ -11,7 +11,6 @@ public class Main {
         System.out.println("♕ 240 Chess Server: " + piece);
 
         Server server = new Server();
-        server.createDatabase();
         server.run(8080);
     }
 }

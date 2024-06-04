@@ -24,11 +24,13 @@ public class Server {
         this.userService = new UserService();
     }
 
-    public void createDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-    }
-
     public int run(int desiredPort) {
+
+        try{
+            DatabaseManager.createDatabase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Spark.port(desiredPort);
 
