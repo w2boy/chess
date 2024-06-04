@@ -81,9 +81,6 @@ public class DataAccessTests {
 
     @Test
     public void posDeleteAllGames() throws DataAccessException {
-        ClearService clearService = new ClearService();
-        GameService gameService = new GameService();
-        UserService userService = new UserService();
         SQLAuthDAO authDAO = new SQLAuthDAO();
         SQLUserDAO userDAO = new SQLUserDAO();
         SQLGameDAO gameDAO = new SQLGameDAO();
@@ -250,42 +247,9 @@ public class DataAccessTests {
         SQLUserDAO userDAO = new SQLUserDAO();
         SQLGameDAO gameDAO = new SQLGameDAO();
 
-        var expected = new GameData (0, null, null, null, null);
-        var actual = new GameData (0, null, null, null, null);
-        //------------------------------------------------
-        GameData gameData = new GameData (0, null, null, "gamename", new ChessGame());
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "insert into game_table (game_id, white_username, black_username, game_name, game) values (?, ?, ?, ?, ?)";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameData.gameID());
-                ps.setString(2, null);
-                ps.setString(3, null);
-                ps.setString(4, gameData.gameName());
-                ps.setString(5, "");
-                if(ps.executeUpdate() == 1) {
-                    // Do Nothing
-                } else {
-                    System.out.println("Failed to insert game");
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
-        }
-
-        gameDAO.deleteAllGames();
-
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT game_id, white_username, black_username, game_name FROM game_table";
-            try (var ps = conn.prepareStatement(statement)) {
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        actual = readGame(rs);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
-        }
+        AuthData expected = authDAO.createAuth("username");
+        //-----------------------------------------------
+        AuthData actual = authDAO.getAuth(expected.authToken());
 
         Assertions.assertEquals(expected, actual);
     }
