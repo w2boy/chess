@@ -343,125 +343,121 @@ public class DataAccessTests {
         SQLUserDAO userDAO = new SQLUserDAO();
         SQLGameDAO gameDAO = new SQLGameDAO();
 
-        var expected = new GameData (0, null, null, null, null);
-        var actual = new GameData (0, null, null, null, null);
+        var expected = new CreateGameResult (null, 1);
+        var actual = new CreateGameResult (null, 0);
         //------------------------------------------------
-        GameData gameData = new GameData (0, null, null, "gamename", new ChessGame());
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "insert into game_table (game_id, white_username, black_username, game_name, game) values (?, ?, ?, ?, ?)";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameData.gameID());
-                ps.setString(2, null);
-                ps.setString(3, null);
-                ps.setString(4, gameData.gameName());
-                ps.setString(5, "");
-                if(ps.executeUpdate() == 1) {
-                    // Do Nothing
-                } else {
-                    System.out.println("Failed to insert game");
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
-        }
-
-        gameDAO.deleteAllGames();
-
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT game_id, white_username, black_username, game_name FROM game_table";
-            try (var ps = conn.prepareStatement(statement)) {
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        actual = readGame(rs);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
-        }
+        actual = gameDAO.createGame(new CreateGameRequest("gamename"));
 
         Assertions.assertEquals(expected, actual);
     }
 
     @Test
     public void negCreateGame() throws DataAccessException {
-        ClearService clearService = new ClearService();
-        GameService gameService = new GameService();
-        UserService userService = new UserService();
         SQLAuthDAO authDAO = new SQLAuthDAO();
         SQLUserDAO userDAO = new SQLUserDAO();
         SQLGameDAO gameDAO = new SQLGameDAO();
 
-        ArrayList<GameData> gamesToList = new ArrayList<>();
-
-        CreateGameResult expected = new CreateGameResult("Error: unauthorized", null);
-
-        UserData userData = new UserData("username", "password", "email");
-        userService.register(gameDAO, userDAO, authDAO, userData);
-        LoginRequest loginRequest = new LoginRequest("username", "password");
-        LoginResult loginResult = userService.login(gameDAO, userDAO, authDAO, loginRequest);
-        UserData userData1 = new UserData("username1", "password", "email");
-        LoginResult loginResult1 = userService.register(gameDAO, userDAO, authDAO, userData);
-
-        CreateGameRequest createGameRequest = new CreateGameRequest("gameName");
-        CreateGameResult actual = gameService.createGame(gameDAO, userDAO, authDAO, loginResult1.authToken(), createGameRequest);
+        gameDAO.createGame(new CreateGameRequest("gamename"));
+        CreateGameResult expected = new CreateGameResult("Game Name Too Long", -1);
+        //------------------------------------------------
+        var actual = gameDAO.createGame(new CreateGameRequest("gamename;lijiasddf;lkjasdf;lkjasdfl;kjkasdfl;kjasdf;lkjasdf;ljasdfdl;kjasdf;lkjasdfl;kjasdfd;lkjasdsf;lkjasdfd;ljkasdf;ljkasdfd;ljkasdf;ljkaxdf;ljkjasdf;lkjasdf;ljikasdfd;ljkasdf;lkjasdf;ljikasdf;lkjasdf;ljkasdf;ljkasdfd;lkjasdfd;ljasdfd;ljasdf;lkajsdf;ljajsdf;lkjasdf;lkjasdf;lkjasdf;lkjasdf;lkasdf;lkjasdf;ljkasdf;ljkasdfl;kjajsdfl;jkasdf;lkjasdfl;kjasdf;ljkasdfl;jkaksdfl;kjkasdf;ljkasdfl;jkasdf;ljkasdfl;jkasdf;ljkasdf;ljkkadsf;ljkasdf;lkjaksdf;lkajksdf;lkjasdf;lkajsdf;lkjasjdfl;ajksdfl;kajsdf;ljkaksdf;lkjasdf;lkjasdfdl;kjasdfl;jkasdf;lkasjkdfd;lkajsdf;lakjsdf;laksjdf;laskjdf;ljkasdf;ljkasdf;lkajsdf;lkajsdf;lkajsjdf;lkasjdf;lkjasdf;lkasjdf;ljkaskdf;jklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklkl"));
 
         Assertions.assertEquals(expected, actual);
     }
 
     @Test
     public void posJoinGame() throws DataAccessException {
-        ClearService clearService = new ClearService();
-        GameService gameService = new GameService();
-        UserService userService = new UserService();
         SQLAuthDAO authDAO = new SQLAuthDAO();
         SQLUserDAO userDAO = new SQLUserDAO();
         SQLGameDAO gameDAO = new SQLGameDAO();
 
-        ArrayList<GameData> gamesToList = new ArrayList<>();
-
-        JoinGameResult expected = new JoinGameResult(null);
-
-        UserData userData = new UserData("username", "password", "email");
-        userService.register(gameDAO, userDAO, authDAO, userData);
-        LoginRequest loginRequest = new LoginRequest("username", "password");
-        LoginResult loginResult = userService.login(gameDAO, userDAO, authDAO, loginRequest);
-
-        CreateGameRequest createGameRequest = new CreateGameRequest("gameName");
-        CreateGameResult createGameResult = gameService.createGame(gameDAO, userDAO, authDAO, loginResult.authToken(), createGameRequest);
-        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 1);
-        JoinGameResult actual = gameService.joinGame(gameDAO, userDAO, authDAO, loginResult.authToken(), joinGameRequest);
+        var expected = new JoinGameResult(null);
+        //------------------------------------------------
+        gameDAO.createGame(new CreateGameRequest("gamename"));
+        var actual = gameDAO.joinGame(new JoinGameRequest("WHITE", 1), "username");
 
         Assertions.assertEquals(expected, actual);
     }
 
     @Test
     public void negJoinGame() throws DataAccessException {
-        ClearService clearService = new ClearService();
-        GameService gameService = new GameService();
-        UserService userService = new UserService();
+        var expected = new JoinGameResult("Error: already taken");
         SQLAuthDAO authDAO = new SQLAuthDAO();
         SQLUserDAO userDAO = new SQLUserDAO();
         SQLGameDAO gameDAO = new SQLGameDAO();
 
-        ArrayList<GameData> gamesToList = new ArrayList<>();
-
-        JoinGameResult expected = new JoinGameResult("Error: unauthorized");
-
-        UserData userData = new UserData("username", "password", "email");
-        userService.register(gameDAO, userDAO, authDAO, userData);
-        LoginRequest loginRequest = new LoginRequest("username", "password");
-        LoginResult loginResult = userService.login(gameDAO, userDAO, authDAO, loginRequest);
-        UserData userData1 = new UserData("username1", "password", "email");
-        LoginResult loginResult1 = userService.register(gameDAO, userDAO, authDAO, userData);
-
-        CreateGameRequest createGameRequest = new CreateGameRequest("gameName");
-        CreateGameResult createGameResult = gameService.createGame(gameDAO, userDAO, authDAO, loginResult.authToken(), createGameRequest);
-        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 1);
-        JoinGameResult actual = gameService.joinGame(gameDAO, userDAO, authDAO, loginResult1.authToken(), joinGameRequest);
+        //------------------------------------------------
+        gameDAO.createGame(new CreateGameRequest("gamename"));
+        gameDAO.joinGame(new JoinGameRequest("WHITE", 1), "username");
+        var actual = gameDAO.joinGame(new JoinGameRequest("WHITE", 1), "username");
 
         Assertions.assertEquals(expected, actual);
     }
+
+    @Test
+    public void posGetListOfGames() throws DataAccessException {
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+        ArrayList<GameData> gamesToList = new ArrayList<>();
+        gamesToList.add(new GameData(1, "username", null, "gamename", null));
+
+        var expected = new ListGamesResult(null, gamesToList);
+
+        //------------------------------------------------
+        gameDAO.createGame(new CreateGameRequest("gamename"));
+        gameDAO.joinGame(new JoinGameRequest("WHITE", 1), "username");
+        var actual = gameDAO.getListOfGames();
+
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void negGetListOfGames() throws DataAccessException {
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+        ArrayList<GameData> gamesToList = new ArrayList<>();
+        gamesToList.add(new GameData(1, null, "username", "gamename", null));
+
+        var expected = new ListGamesResult(null, gamesToList);
+
+        //------------------------------------------------
+        gameDAO.createGame(new CreateGameRequest("gamename"));
+        gameDAO.joinGame(new JoinGameRequest("BLACK", 1), "username");
+        var actual = gameDAO.getListOfGames();
+
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void posCreateUser() throws DataAccessException {
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+
+        var expected = new UserData ("username", "hashedPassword", "w@gmail.com");
+        var actual = new UserData ("username", "hashedPassword", "w@gmail.com");
+        //------------------------------------------------
+        userDAO.createUser(new UserData ("username", "hashedPassword", "w@gmail.com"));
+
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void negCreateUser() throws DataAccessException {
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+
+        var expected = new UserData ("username1", "hashedPassword", "w@gmail.com");
+        var actual = new UserData ("username1", "hashedPassword", "w@gmail.com");
+        //------------------------------------------------
+        userDAO.createUser(new UserData ("username", "hashedPassword", "w@gmail.com"));
+
+        Assertions.assertEquals(expected, actual);
+    }
+
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
         return new AuthData(rs.getString("auth_token"), rs.getString("username"));

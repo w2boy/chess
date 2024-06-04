@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLGameDAO {
-    private ArrayList<GameData> games = new ArrayList<>();
+    Integer numGames = 0;
 
     public void deleteAllGames() throws DataAccessException{
         Connection connection = null;
@@ -37,6 +37,7 @@ public class SQLGameDAO {
         } catch (SQLException e) {
             throw new DataAccessException("Error while deleting all game data");
         }
+        numGames = 0;
     }
 
     public ListGamesResult getListOfGames() throws DataAccessException{
@@ -60,7 +61,11 @@ public class SQLGameDAO {
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
-        int gameID = games.size() + 1;
+        if (createGameRequest.gameName().length() > 255){
+            return new CreateGameResult("Game Name Too Long", -1);
+        }
+        numGames += 1;
+        int gameID = numGames;
         ChessGame chessGame = new ChessGame();
         GameData gameData = new GameData (gameID, null, null, createGameRequest.gameName(), chessGame);
         String chessGameJson = new Gson().toJson(chessGame, ChessGame.class);
@@ -77,6 +82,7 @@ public class SQLGameDAO {
                     // Do Nothing
                 } else {
                     System.out.println("Failed to insert game");
+                    return null;
                 }
             }
         } catch (Exception e) {
@@ -89,6 +95,10 @@ public class SQLGameDAO {
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String username) throws DataAccessException {
         String statement = "SELECT game_id, white_username, black_username, game_name, game FROM game_table WHERE game_id=?";
         int desiredGameID = joinGameRequest.gameID();
+
+        if (joinGameRequest.playerColor() == null){
+            return new JoinGameResult("Error: bad request");
+        }
 
         if (!(joinGameRequest.playerColor().equals("WHITE") || joinGameRequest.playerColor().equals("BLACK"))) {
             return new JoinGameResult("Error: bad request");
