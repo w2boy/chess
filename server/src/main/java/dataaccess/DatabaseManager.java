@@ -52,25 +52,25 @@ public class DatabaseManager {
         String[] statements = {
                 """
                 CREATE TABLE IF NOT EXISTS auth_table (
-                  `auth_token` varchar(255) not null primary key,
-                  `username` varchar(255) not null
+                  auth_token varchar(255) not null primary key,
+                  username varchar(255) not null
                 );
                 
                 """,
                 """
                 CREATE TABLE IF NOT EXISTS user_table (
-                  `username` varchar(255) not null primary key unique,
-                  `password` varchar(255) not null,
-                  `email` varchar(255) not null
+                  username varchar(255) not null primary key unique,
+                  password varchar(255) not null,
+                  email varchar(255) not null
                 );
                 """,
                 """
                 CREATE TABLE IF NOT EXISTS game_table (
-                  `game_id` int not null primary key unique,
-                  `white_username` varchar(255),
-                  `black_username` varchar(255),
-                  `game_name` varchar(255) not null,
-                  `game` LONGTEXT not null
+                  game_id int not null primary key unique,
+                  white_username varchar(255),
+                  black_username varchar(255),
+                  game_name varchar(255) not null,
+                  game LONGTEXT not null
                 );
                 
                 """
