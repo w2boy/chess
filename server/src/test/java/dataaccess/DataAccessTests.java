@@ -458,6 +458,62 @@ public class DataAccessTests {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    public void posGetUser() throws DataAccessException {
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+        userDAO.createUser(new UserData ("username", "hashedPassword", "w@gmail.com"));
+
+        var expected = userDAO.getUser("username", "hashedPassword");
+        //------------------------------------------------
+
+        var actual = userDAO.getUser("username", "hashedPassword");
+
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void negGetUser() throws DataAccessException {
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+        userDAO.createUser(new UserData ("username", "hashedPassword", "w@gmail.com"));
+        userDAO.deleteAllUsers();
+        UserData expected = null;
+        //------------------------------------------------
+        var actual = userDAO.getUser("username", "hashedPassword");
+
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void posUserExists() throws DataAccessException {
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+        userDAO.createUser(new UserData ("username", "hashedPassword", "w@gmail.com"));
+        boolean expected = true;
+        //------------------------------------------------
+        var actual = userDAO.userExists("username");
+
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void negUserExists() throws DataAccessException {
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
+        userDAO.createUser(new UserData ("username", "hashedPassword", "w@gmail.com"));
+        userDAO.deleteAllUsers();
+        boolean expected = false;
+        //------------------------------------------------
+        var actual = userDAO.userExists("username");
+
+        Assertions.assertEquals(expected, actual);
+    }
+
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
         return new AuthData(rs.getString("auth_token"), rs.getString("username"));
