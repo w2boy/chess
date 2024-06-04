@@ -484,8 +484,7 @@ public class DataAccessTests {
     }
 
     private GameData readGame(ResultSet rs) throws SQLException {
-        String chessGameJson = rs.getString("game");
-        ChessGame chessGame = new Gson().fromJson(chessGameJson, ChessGame.class);
+        ChessGame chessGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);
         return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), chessGame);
     }
 
