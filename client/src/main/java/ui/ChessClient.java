@@ -1,16 +1,17 @@
 package ui;
 
 import model.UserData;
+import service.CreateGameRequest;
+import service.CreateGameResult;
 import service.LoginRequest;
 import service.LoginResult;
 
 import java.util.Arrays;
 
 public class ChessClient {
-    private String visitorName = null;
-    private final ServerFacade server;
-    private final String serverUrl;
-    private final Repl repl;
+    private ServerFacade server;
+    private String serverUrl;
+    private Repl repl;
     State state = State.LOGGED_OUT;
     String authToken = null;
 
@@ -96,16 +97,14 @@ public class ChessClient {
     }
 
     public String createGame(String... params) throws ResponseException {
-//        assertSignedIn();
-//        if (params.length >= 2) {
-//            var name = params[0];
-//            var type = PetType.valueOf(params[1].toUpperCase());
-//            var pet = new Pet(0, name, type);
-//            pet = server.addPet(pet);
-//            return String.format("You rescued %s. Assigned ID: %d", pet.name(), pet.id());
-//        }
-        return "createGame";
-        //throw new ResponseException("Expected: <name> <CAT|DOG|FROG>");
+        assertLoggedIn();
+        if (params.length >= 1) {
+            var gameName = params[0];
+            CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
+            CreateGameResult createGameResult = server.createGame(createGameRequest, authToken);
+            return String.format("You game ID is %d.", createGameResult.gameID());
+        }
+        throw new ResponseException("Expected: <name> <CAT|DOG|FROG>");
     }
 //
 //    public String listGames() throws ResponseException {

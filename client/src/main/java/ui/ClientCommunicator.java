@@ -12,7 +12,7 @@ import java.net.URL;
 
 public class ClientCommunicator {
 
-    public void doPost(String urlString) throws IOException {
+    public void doPostWithHeader(String urlString, String authToken) throws IOException {
         URL url = new URL(urlString);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -49,12 +49,17 @@ public class ClientCommunicator {
         }
     }
 
-    public <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String serverUrl) throws ResponseException {
+    public <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String serverUrl, String authToken) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            // Add a header if there is a header
+            if (authToken != null){
+                http.addRequestProperty("authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();

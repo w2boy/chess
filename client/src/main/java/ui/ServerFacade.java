@@ -2,6 +2,8 @@ package ui;
 
 import com.google.gson.Gson;
 import model.UserData;
+import service.CreateGameRequest;
+import service.CreateGameResult;
 import service.LoginRequest;
 import service.LoginResult;
 
@@ -20,14 +22,20 @@ public class ServerFacade {
 
     public LoginResult register(UserData newUser) throws ResponseException {
         var path = "/user";
-        LoginResult loginResult = clientCommunicator.makeRequest("POST", path, newUser, LoginResult.class, serverUrl);
+        LoginResult loginResult = clientCommunicator.makeRequest("POST", path, newUser, LoginResult.class, serverUrl, null);
         return loginResult;
     }
 
     public LoginResult logIn(LoginRequest loginRequest) throws ResponseException {
         var path = "/session";
-        LoginResult loginResult = clientCommunicator.makeRequest("POST", path, loginRequest, LoginResult.class, serverUrl);
+        LoginResult loginResult = clientCommunicator.makeRequest("POST", path, loginRequest, LoginResult.class, serverUrl, null);
         return loginResult;
+    }
+
+    public CreateGameResult createGame(CreateGameRequest createGameRequest, String authToken) throws ResponseException {
+        var path = "/game";
+        CreateGameResult createGameResult = clientCommunicator.makeRequest("POST", path, createGameRequest, CreateGameResult.class, serverUrl, authToken);
+        return createGameResult;
     }
 //
 //    public void deletePet(int id) throws ResponseException {
