@@ -2,10 +2,7 @@ package ui;
 
 import com.google.gson.Gson;
 import model.UserData;
-import service.CreateGameRequest;
-import service.CreateGameResult;
-import service.LoginRequest;
-import service.LoginResult;
+import service.*;
 
 import java.io.*;
 import java.net.*;
@@ -36,6 +33,11 @@ public class ServerFacade {
         var path = "/game";
         CreateGameResult createGameResult = clientCommunicator.makeRequest("POST", path, createGameRequest, CreateGameResult.class, serverUrl, authToken);
         return createGameResult;
+    }
+
+    public LogoutResult logOut(String authToken) throws ResponseException {
+        var path = "/session";
+        return clientCommunicator.makeRequest("DELETE", path, new LogoutRequest(authToken), LogoutResult.class, serverUrl, authToken);
     }
 //
 //    public void deletePet(int id) throws ResponseException {

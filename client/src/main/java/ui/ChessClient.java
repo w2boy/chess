@@ -1,10 +1,7 @@
 package ui;
 
 import model.UserData;
-import service.CreateGameRequest;
-import service.CreateGameResult;
-import service.LoginRequest;
-import service.LoginResult;
+import service.*;
 
 import java.util.Arrays;
 
@@ -59,7 +56,7 @@ public class ChessClient {
 //                case "list" -> listGames();
 //                case "join" -> joinGame(params);
 //                case "observe" -> observeGame(params);
-//                case "logout" -> logOut();
+                case "logout" -> logOut();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -150,11 +147,13 @@ public class ChessClient {
 //        throw new ResponseException(400, "Expected: <pet id>");
 //    }
 //
-//    public String logOut() throws ResponseException {
-//        assertSignedIn();
-//        state = State.LOGGED_OUT;
-//        return String.format("%s left the shop", visitorName);
-//    }
+    public String logOut() throws ResponseException {
+        assertLoggedIn();
+        LogoutResult logoutResult = server.logOut(authToken);
+        authToken = null;
+        state = State.LOGGED_OUT;
+        return String.format("You are logged out");
+    }
 //
 //    private Pet getPet(int id) throws ResponseException {
 //        for (var pet : server.listPets()) {
