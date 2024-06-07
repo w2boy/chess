@@ -1,5 +1,6 @@
 package ui;
 
+import com.google.gson.Gson;
 import model.UserData;
 import service.*;
 
@@ -53,7 +54,7 @@ public class ChessClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "create" -> createGame(params);
-//                case "list" -> listGames();
+                case "list" -> listGames();
 //                case "join" -> joinGame(params);
 //                case "observe" -> observeGame(params);
                 case "logout" -> logOut();
@@ -103,17 +104,16 @@ public class ChessClient {
         }
         throw new ResponseException("Expected: <name> <CAT|DOG|FROG>");
     }
-//
-//    public String listGames() throws ResponseException {
-//        assertSignedIn();
-//        var pets = server.listPets();
-//        var result = new StringBuilder();
-//        var gson = new Gson();
-//        for (var pet : pets) {
-//            result.append(gson.toJson(pet)).append('\n');
-//        }
-//        return result.toString();
-//    }
+
+    public String listGames() throws ResponseException {
+        assertLoggedIn();
+        ListGamesResult listGamesResult = server.listGames(authToken);
+        var result = new StringBuilder();
+        for (var game : listGamesResult.games()) {
+            result.append(game).append('\n');
+        }
+        return result.toString();
+    }
 //
 //    public String joinGame(String... params) throws ResponseException {
 //        assertSignedIn();

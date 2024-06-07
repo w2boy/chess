@@ -6,6 +6,7 @@ import service.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.List;
 
 public class ServerFacade {
 
@@ -38,6 +39,11 @@ public class ServerFacade {
     public LogoutResult logOut(String authToken) throws ResponseException {
         var path = "/session";
         return clientCommunicator.makeRequest("DELETE", path, new LogoutRequest(authToken), LogoutResult.class, serverUrl, authToken);
+    }
+
+    public ListGamesResult listGames(String authToken) throws ResponseException {
+        var path = "/game";
+        return clientCommunicator.makeRequest("GET", path, new ListGamesRequest(authToken), ListGamesResult.class, serverUrl, authToken);
     }
 //
 //    public void deletePet(int id) throws ResponseException {
