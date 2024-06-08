@@ -63,32 +63,6 @@ public class DrawBoard {
         out.println();
     }
 
-    private static void drawHeadersBlack(PrintStream out) {
-
-        setDarkGrey(out);
-
-        String[] headers = { "h", "g", "f", "e", "d", "c", "b", "a" };
-
-        out.print("    ");
-        out.print(headers[0]);
-        out.print("  ");
-        out.print(headers[1]);
-        out.print("  ");
-        out.print(headers[2]);
-        out.print("  ");
-        out.print(headers[3]);
-        out.print("  ");
-        out.print(headers[4]);
-        out.print("  ");
-        out.print(headers[5]);
-        out.print("  ");
-        out.print(headers[6]);
-        out.print("  ");
-        out.print(headers[7]);
-
-        out.println();
-    }
-
     private static void drawChessBoardWhite(PrintStream out, ChessPiece[][] matrix) {
             drawSquares(out, matrix, "WHITE");
             setDarkGrey(out);
