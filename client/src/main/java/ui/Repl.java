@@ -11,6 +11,7 @@ import static java.awt.Color.*;
 public class Repl {
     private final ChessClient client;
     private final DrawBoard drawBoard = new DrawBoard();
+    private ChessBoard chessBoard = new ChessBoard();
 
 
     public Repl(String serverUrl) {
@@ -18,7 +19,8 @@ public class Repl {
     }
 
     public void run() {
-        drawBoard.run(new ChessPiece[8][8]);
+        chessBoard.resetBoard();
+        drawBoard.run(chessBoard.squares);
         System.out.println("Welcome to 240 Chess! (Legally Distinct Chess) Type an option.");
         System.out.print(client.help());
 
