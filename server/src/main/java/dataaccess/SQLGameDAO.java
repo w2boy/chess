@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
@@ -153,6 +154,25 @@ public class SQLGameDAO {
         }
 
         return new JoinGameResult("Error: bad request");
+    }
+
+    public ChessBoard getChessBoard(int gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT game FROM game_table WHERE game_id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, Integer.toString(gameID));
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String chessGameJson = rs.getString("game");
+                        ChessGame game = new Gson().fromJson(chessGameJson, ChessGame.class);
+                        return game.getBoard();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
     }
 
     private GameData readGame(ResultSet rs) throws SQLException {
