@@ -1,9 +1,7 @@
 package client;
 
 import model.UserData;
-import service.*;
-import ui.ResponseException;
-import ui.ServerFacade;
+import ui.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 
