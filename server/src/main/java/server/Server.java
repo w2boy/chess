@@ -1,4 +1,5 @@
 package server;
+import chess.ChessBoard;
 import com.google.gson.Gson;
 import dataaccess.*;
 import service.*;
@@ -46,6 +47,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
+        Spark.get("/game/board", this::getGameBoard);
         //        Spark.exception(ResponseException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
@@ -148,5 +150,12 @@ public class Server {
             res.status(200);
         }
         return new Gson().toJson(joinGameResult);
+    }
+
+    private Object getGameBoard(Request req, Response res) throws DataAccessException {
+        GetBoardRequest getBoardRequest = new Gson().fromJson(req.body(), GetBoardRequest.class);
+        ChessBoard chessBoard = gameService.getGameBoard(gameSQLDAO, getBoardRequest);
+        res.status(200);
+        return new Gson().toJson(chessBoard);
     }
 }

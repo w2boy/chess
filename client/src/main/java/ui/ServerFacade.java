@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import com.google.gson.Gson;
 import model.UserData;
 import service.*;
@@ -55,5 +56,10 @@ public class ServerFacade {
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String authToken) throws ResponseException {
         var path = "/game";
         return clientCommunicator.makeRequest("PUT", path, joinGameRequest, JoinGameResult.class, serverUrl, authToken);
+    }
+
+    public ChessBoard getGameBoard(GetBoardRequest getBoardRequest) throws ResponseException {
+        var path = "/game/board";
+        return clientCommunicator.makeRequest("GET", path, getBoardRequest, ChessBoard.class, serverUrl, null);
     }
 }

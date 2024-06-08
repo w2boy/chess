@@ -160,7 +160,8 @@ public class SQLGameDAO {
         return new JoinGameResult("Error: bad request");
     }
 
-    public ChessBoard getChessBoard(int gameID) throws DataAccessException {
+    public ChessBoard getGameBoard(GetBoardRequest getBoardRequest) throws DataAccessException {
+        int gameID = getBoardRequest.gameID();
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT game FROM game_table WHERE game_id=?";
             try (var ps = conn.prepareStatement(statement)) {

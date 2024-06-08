@@ -3,8 +3,6 @@ package ui;
 import chess.ChessBoard;
 import chess.ChessPiece;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.SQLGameDAO;
 import model.UserData;
 import service.*;
 
@@ -12,7 +10,6 @@ import java.util.Arrays;
 
 public class ChessClient {
     private final DrawBoard drawBoard = new DrawBoard();
-    private final SQLGameDAO sqlGameDAO = new SQLGameDAO();
     private ServerFacade server;
     private String serverUrl;
     private Repl repl;
@@ -68,7 +65,7 @@ public class ChessClient {
                 case "quit" -> "quit";
                 default -> help();
             };
-        } catch (ResponseException | DataAccessException ex) {
+        } catch (ResponseException ex) {
             return ex.getMessage();
         }
     }
@@ -123,14 +120,14 @@ public class ChessClient {
         return result.toString();
     }
 
-    public String joinGame(String... params) throws ResponseException, DataAccessException {
+    public String joinGame(String... params) throws ResponseException {
         assertLoggedIn();
         if (params.length == 2) {
             int id = Integer.parseInt(params[0]);
             String color = params[1];
             JoinGameRequest joinGameRequest = new JoinGameRequest (color, id);
             JoinGameResult joingameResult = server.joinGame(joinGameRequest, authToken);
-            ChessBoard chessBoard = sqlGameDAO.getChessBoard(id);
+            ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(id));
             ChessPiece[][] matrix = chessBoard.squares;
             drawBoard.run(matrix);
             return String.format("Joined Game");
@@ -138,11 +135,11 @@ public class ChessClient {
         throw new ResponseException("<ID> [WHITE|BLACK]");
     }
 
-    public String observeGame(String... params) throws ResponseException, DataAccessException {
+    public String observeGame(String... params) throws ResponseException {
         assertLoggedIn();
         if (params.length == 1) {
             int id = Integer.parseInt(params[0]);
-            ChessBoard chessBoard = sqlGameDAO.getChessBoard(id);
+            ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(id));
             ChessPiece[][] matrix = chessBoard.squares;
             drawBoard.run(matrix);
             return String.format("Observing Game %d", id);

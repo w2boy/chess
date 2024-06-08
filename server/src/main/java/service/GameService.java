@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessBoard;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
@@ -27,5 +28,9 @@ public class GameService {
             return gameDAO.joinGame(joinGameRequest, authData.username());
         }
         return new JoinGameResult("Error: unauthorized");
+    }
+
+    public ChessBoard getGameBoard(SQLGameDAO gameDAO, GetBoardRequest getBoardRequest) throws DataAccessException {
+        return gameDAO.getGameBoard( getBoardRequest);
     }
 }

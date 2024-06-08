@@ -1,9 +1,5 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessPiece;
-import server.Server;
-
 import java.util.Scanner;
 
 import static java.awt.Color.*;
