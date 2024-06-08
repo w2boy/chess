@@ -1,3 +1,3 @@
-package ui;
+package model;
 
 public record ClearResult  (String message) {}

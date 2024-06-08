@@ -47,7 +47,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
-        Spark.get("/game/board", this::getGameBoard);
+        Spark.put("/game/board", this::getGameBoard);
         //        Spark.exception(ResponseException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();

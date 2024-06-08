@@ -1,4 +1,4 @@
-package ui;
+package model;
 
 public record GetBoardRequest(
         int gameID

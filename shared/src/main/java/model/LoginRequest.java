@@ -1,4 +1,4 @@
-package ui;
+package model;
 
 public record LoginRequest(
         String username, String password) {}

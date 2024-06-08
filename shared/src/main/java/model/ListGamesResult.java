@@ -1,6 +1,4 @@
-package ui;
-
-import model.GameData;
+package model;
 
 import java.util.ArrayList;
 

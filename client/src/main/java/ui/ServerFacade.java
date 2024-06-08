@@ -7,6 +7,7 @@ import model.UserData;
 import java.io.*;
 import java.net.*;
 import java.util.List;
+import model.*;
 
 public class ServerFacade {
 
@@ -59,6 +60,6 @@ public class ServerFacade {
 
     public ChessBoard getGameBoard(GetBoardRequest getBoardRequest) throws ResponseException {
         var path = "/game/board";
-        return clientCommunicator.makeRequest("GET", path, getBoardRequest, ChessBoard.class, serverUrl, null);
+        return clientCommunicator.makeRequest("PUT", path, getBoardRequest, ChessBoard.class, serverUrl, null);
     }
 }

@@ -1,6 +1,6 @@
 package client;
 
-import model.UserData;
+import model.*;
 import ui.*;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ServerFacadeTests {
 
     private static Server server;
-    static ServerFacade facade;
+    static ui.ServerFacade facade;
 
     @BeforeAll
     public static void init()  {
