@@ -66,7 +66,7 @@ public class DatabaseManager {
                 """,
                 """
                 CREATE TABLE IF NOT EXISTS game_table (
-                  game_id int not null primary key unique,
+                  game_id int not null primary key AUTO_INCREMENT,
                   white_username varchar(255),
                   black_username varchar(255),
                   game_name varchar(255) not null,

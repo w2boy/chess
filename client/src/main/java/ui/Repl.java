@@ -24,6 +24,7 @@ public class Repl {
             String line = scanner.nextLine();
 
             try {
+
                 result = client.eval(line);
                 System.out.print(result);
             } catch (Throwable e) {

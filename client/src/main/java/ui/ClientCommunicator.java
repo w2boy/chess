@@ -61,7 +61,9 @@ public class ClientCommunicator {
                 http.addRequestProperty("authorization", authToken);
             }
 
-            writeBody(request, http);
+            if (!method.equals("GET")){
+                writeBody(request, http);
+            }
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);

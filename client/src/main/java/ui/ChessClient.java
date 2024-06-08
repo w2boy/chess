@@ -20,7 +20,7 @@ public class ChessClient {
     }
 
     public String eval(String input) {
-        var tokens = input.toLowerCase().split(" ");
+        var tokens = input.split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         if (state == State.LOGGED_OUT) {
@@ -33,7 +33,7 @@ public class ChessClient {
 
     public String evalLoggedOut(String input) {
         try {
-            var tokens = input.toLowerCase().split(" ");
+            var tokens = input.split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
@@ -49,13 +49,13 @@ public class ChessClient {
 
     public String evalLoggedIn(String input) {
         try {
-            var tokens = input.toLowerCase().split(" ");
+            var tokens = input.split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "create" -> createGame(params);
                 case "list" -> listGames();
-//                case "join" -> joinGame(params);
+                case "join" -> joinGame(params);
 //                case "observe" -> observeGame(params);
                 case "logout" -> logOut();
                 case "quit" -> "quit";
@@ -114,22 +114,18 @@ public class ChessClient {
         }
         return result.toString();
     }
-//
-//    public String joinGame(String... params) throws ResponseException {
-//        assertSignedIn();
-//        if (params.length == 1) {
-//            try {
-//                var id = Integer.parseInt(params[0]);
-//                var pet = getPet(id);
-//                if (pet != null) {
-//                    server.deletePet(id);
-//                    return String.format("%s says %s", pet.name(), pet.sound());
-//                }
-//            } catch (NumberFormatException ignored) {
-//            }
-//        }
-//        throw new ResponseException(400, "Expected: <pet id>");
-//    }
+
+    public String joinGame(String... params) throws ResponseException {
+        assertLoggedIn();
+        if (params.length == 2) {
+            int id = Integer.parseInt(params[0]);
+            String color = params[1];
+            JoinGameRequest joinGameRequest = new JoinGameRequest (color, id);
+            JoinGameResult joingameResult = server.joinGame(joinGameRequest, authToken);
+            return String.format("Joined Game");
+        }
+        throw new ResponseException("<ID> [WHITE|BLACK]");
+    }
 //
 //    public String observeGame(String... params) throws ResponseException {
 //        assertSignedIn();

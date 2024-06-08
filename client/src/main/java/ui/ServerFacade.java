@@ -43,7 +43,13 @@ public class ServerFacade {
 
     public ListGamesResult listGames(String authToken) throws ResponseException {
         var path = "/game";
-        return clientCommunicator.makeRequest("GET", path, new ListGamesRequest(authToken), ListGamesResult.class, serverUrl, authToken);
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        return clientCommunicator.makeRequest("GET", path, listGamesRequest, ListGamesResult.class, serverUrl, authToken);
+    }
+
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String authToken) throws ResponseException {
+        var path = "/game";
+        return clientCommunicator.makeRequest("PUT", path, joinGameRequest, JoinGameResult.class, serverUrl, authToken);
     }
 //
 //    public void deletePet(int id) throws ResponseException {

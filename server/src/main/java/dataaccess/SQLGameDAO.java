@@ -64,20 +64,19 @@ public class SQLGameDAO {
         if (createGameRequest.gameName().length() > 255){
             return new CreateGameResult("Game Name Too Long", -1);
         }
-        numGames += 1;
-        int gameID = numGames;
+        int gameID = 0;
         ChessGame chessGame = new ChessGame();
-        GameData gameData = new GameData (gameID, null, null, createGameRequest.gameName(), chessGame);
+        GameData gameData = new GameData (0, null, null, createGameRequest.gameName(), chessGame);
         String chessGameJson = new Gson().toJson(chessGame, ChessGame.class);
 
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "insert into game_table (game_id, white_username, black_username, game_name, game) values (?, ?, ?, ?, ?)";
+            var statement = "insert into game_table ( white_username, black_username, game_name, game) values (?, ?, ?, ?)";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameData.gameID());
+//                ps.setInt(1, gameData.gameID());
+                ps.setString(1, null);
                 ps.setString(2, null);
-                ps.setString(3, null);
-                ps.setString(4, gameData.gameName());
-                ps.setString(5, chessGameJson);
+                ps.setString(3, gameData.gameName());
+                ps.setString(4, chessGameJson);
                 if(ps.executeUpdate() == 1) {
                     // Do Nothing
                 } else {
@@ -89,7 +88,22 @@ public class SQLGameDAO {
             throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
         }
 
-        return new CreateGameResult(null, gameData.gameID());
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT game_id FROM game_table WHERE game_name=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, createGameRequest.gameName());
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+
+                        gameID = rs.getInt("game_id");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
+        }
+
+        return new CreateGameResult(null, gameID);
     }
 
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String username) throws DataAccessException {
