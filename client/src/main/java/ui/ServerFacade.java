@@ -3,7 +3,6 @@ package ui;
 import chess.ChessBoard;
 import com.google.gson.Gson;
 import model.UserData;
-import service.*;
 
 import java.io.*;
 import java.net.*;
