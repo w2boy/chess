@@ -25,25 +25,23 @@ public class DrawBoard {
 
         out.print(ERASE_SCREEN);
 
-        drawHeaders(out);
+        drawHeaders(out, new String[] { "a", "b", "c", "d", "e", "f", "g", "h" });
 
         drawChessBoardWhite(out, matrix);
 
         out.println();
         out.println();
 
-        drawHeadersBlack(out);
+        drawHeaders(out, new String[] { "h", "g", "f", "e", "d", "c", "b", "a" });
 
         drawChessBoardBlack(out, matrix);
 
         setDarkGrey(out);
     }
 
-    private static void drawHeaders(PrintStream out) {
+    private static void drawHeaders(PrintStream out, String[] headers) {
 
         setDarkGrey(out);
-
-        String[] headers = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
         out.print("    ");
         out.print(headers[0]);
