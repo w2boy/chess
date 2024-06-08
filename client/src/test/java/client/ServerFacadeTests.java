@@ -16,12 +16,16 @@ public class ServerFacadeTests {
     static ServerFacade facade;
 
     @BeforeAll
-    public static void init() throws ResponseException {
+    public static void init()  {
         server = new Server();
         int port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         String serverUrl = "http://localhost:" + Integer.toString(port);
         facade = new ServerFacade(serverUrl);
+    }
+
+    @BeforeEach
+    void clearAllData() throws ResponseException {
         facade.clearAllData();
     }
 

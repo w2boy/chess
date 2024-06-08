@@ -32,7 +32,11 @@ public class SQLGameDAO {
 
                 int count = stmt.executeUpdate();
 
-                // System.out.printf("Deleted %d authTokens\n", count);
+                sql = "ALTER TABLE game_table AUTO_INCREMENT = 1";
+                try(PreparedStatement resetAutoIncrementStatement = connection.prepareStatement(sql)) {
+                    resetAutoIncrementStatement.executeUpdate();
+                }
+
             }
 
         } catch (SQLException e) {
