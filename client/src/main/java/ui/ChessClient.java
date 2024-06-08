@@ -56,7 +56,7 @@ public class ChessClient {
                 case "create" -> createGame(params);
                 case "list" -> listGames();
                 case "join" -> joinGame(params);
-//                case "observe" -> observeGame(params);
+                case "observe" -> observeGame(params);
                 case "logout" -> logOut();
                 case "quit" -> "quit";
                 default -> help();
@@ -110,7 +110,8 @@ public class ChessClient {
         ListGamesResult listGamesResult = server.listGames(authToken);
         var result = new StringBuilder();
         for (var game : listGamesResult.games()) {
-            result.append(game).append('\n');
+            ListGamesOutput listGamesOutput = new ListGamesOutput(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName());
+            result.append(listGamesOutput).append('\n');
         }
         return result.toString();
     }
@@ -126,23 +127,16 @@ public class ChessClient {
         }
         throw new ResponseException("<ID> [WHITE|BLACK]");
     }
-//
-//    public String observeGame(String... params) throws ResponseException {
-//        assertSignedIn();
-//        if (params.length == 1) {
-//            try {
-//                var id = Integer.parseInt(params[0]);
-//                var pet = getPet(id);
-//                if (pet != null) {
-//                    server.deletePet(id);
-//                    return String.format("%s says %s", pet.name(), pet.sound());
-//                }
-//            } catch (NumberFormatException ignored) {
-//            }
-//        }
-//        throw new ResponseException(400, "Expected: <pet id>");
-//    }
-//
+
+    public String observeGame(String... params) throws ResponseException {
+        assertLoggedIn();
+        if (params.length == 1) {
+            int id = Integer.parseInt(params[0]);
+            return String.format("Observing Game %d", id);
+        }
+        throw new ResponseException("<ID>");
+    }
+
     public String logOut() throws ResponseException {
         assertLoggedIn();
         LogoutResult logoutResult = server.logOut(authToken);
@@ -150,15 +144,6 @@ public class ChessClient {
         state = State.LOGGED_OUT;
         return String.format("You are logged out");
     }
-//
-//    private Pet getPet(int id) throws ResponseException {
-//        for (var pet : server.listPets()) {
-//            if (pet.id() == id) {
-//                return pet;
-//            }
-//        }
-//        return null;
-//    }
 
     public String help(){
         if (state == State.LOGGED_OUT) {
