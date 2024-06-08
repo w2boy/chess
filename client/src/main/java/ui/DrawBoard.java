@@ -113,7 +113,7 @@ public class DrawBoard {
             for (int boardCol = 0; boardCol < 8; ++boardCol) {
 
                 //Figure out Chess Piece
-                ChessPiece currentPiece = matrix[7-squareRow][7-boardCol];
+                ChessPiece currentPiece = matrix[squareRow][7-boardCol];
                 String type = " ";
                 if (currentPiece != null){
                     ChessPiece.PieceType pieceType = currentPiece.getPieceType();

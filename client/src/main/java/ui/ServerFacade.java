@@ -17,6 +17,11 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public ClearResult clearAllData() throws ResponseException {
+        var path = "/db";
+        ClearResult clearResult = clientCommunicator.makeRequest("DELETE", path, "", ClearResult.class, serverUrl, null);
+        return clearResult;
+    }
 
     public LoginResult register(UserData newUser) throws ResponseException {
         var path = "/user";
@@ -51,24 +56,4 @@ public class ServerFacade {
         var path = "/game";
         return clientCommunicator.makeRequest("PUT", path, joinGameRequest, JoinGameResult.class, serverUrl, authToken);
     }
-//
-//    public void deletePet(int id) throws ResponseException {
-//        var path = String.format("/pet/%s", id);
-//        this.makeRequest("DELETE", path, null, null);
-//    }
-//
-//    public void deleteAllPets() throws ResponseException {
-//        var path = "/pet";
-//        this.makeRequest("DELETE", path, null, null);
-//    }
-//
-//    public Pet[] listPets() throws ResponseException {
-//        var path = "/pet";
-//        record listPetResponse(Pet[] pet) {
-//        }
-//        var response = this.makeRequest("GET", path, null, listPetResponse.class);
-//        return response.pet();
-//    }
-
-
 }
