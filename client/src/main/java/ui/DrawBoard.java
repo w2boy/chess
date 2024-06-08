@@ -92,104 +92,44 @@ public class DrawBoard {
     }
 
     private static void drawChessBoardWhite(PrintStream out, ChessPiece[][] matrix) {
-            drawSquaresWhite(out, matrix);
+            drawSquares(out, matrix, "WHITE");
             setDarkGrey(out);
     }
 
     private static void drawChessBoardBlack(PrintStream out, ChessPiece[][] matrix) {
-        drawSquaresBlack(out, matrix);
+        drawSquares(out, matrix, "BLACK");
         setDarkGrey(out);
     }
 
-    private static void drawSquaresBlack(PrintStream out, ChessPiece[][] matrix) {
+    private static void drawSquares(PrintStream out, ChessPiece[][] matrix, String color) {
 
         setDarkGrey(out);
 
         for (int squareRow = 0; squareRow < 8; ++squareRow) {
-            int rowNumber = 1 + squareRow;
-            out.print(" ");
-            out.print(Integer.toString(rowNumber));
-            out.print(" ");
-            for (int boardCol = 0; boardCol < 8; ++boardCol) {
-
-                //Figure out Chess Piece
-                ChessPiece currentPiece = matrix[squareRow][7-boardCol];
-                String type = " ";
-                if (currentPiece != null){
-                    ChessPiece.PieceType pieceType = currentPiece.getPieceType();
-                    switch (pieceType){
-                        case KNIGHT:
-                            type = "N";
-                            break;
-                        case PAWN:
-                            type = "P";
-                            break;
-                        case ROOK:
-                            type = "R";
-                            break;
-                        case BISHOP:
-                            type = "B";
-                            break;
-                        case QUEEN:
-                            type = "Q";
-                            break;
-                        case KING:
-                            type = "K";
-                            break;
-                    }
-                    if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE){
-                        setGreen(out);
-                    } else {
-                        setRed(out);
-                    }
-                }
-
-                //Display Piece
-                if (squareRow % 2 == 0){
-
-                    if (boardCol % 2 == 0){
-                        setWhite(out);
-                    } else {
-                        setBlack(out);
-                    }
-
-                    out.print(" ");
-                    out.print(type);
-                    out.print(" ");
-
-                    setDarkGrey(out);
-                } else {
-                    if (boardCol % 2 == 0){
-                        setBlack(out);
-                    } else {
-                        setWhite(out);
-                    }
-
-                    out.print(" ");
-                    out.print(type);
-                    out.print(" ");
-
-                    setDarkGrey(out);
-                }
+            int rowNumber;
+            if (color.equals("WHITE")){
+                rowNumber = 8 - squareRow;
+            } else {
+                rowNumber = 1 + squareRow;
             }
 
-            out.println();
-        }
-    }
-
-    private static void drawSquaresWhite(PrintStream out, ChessPiece[][] matrix) {
-
-        setDarkGrey(out);
-
-        for (int squareRow = 0; squareRow < 8; ++squareRow) {
-            int rowNumber = 8 - squareRow;
             out.print(" ");
             out.print(Integer.toString(rowNumber));
             out.print(" ");
             for (int boardCol = 0; boardCol < 8; ++boardCol) {
 
+                int horizonotalView;
+                int verticleView;
+                if (color.equals("WHITE")){
+                    horizonotalView = boardCol;
+                    verticleView = 7-squareRow;
+                } else {
+                    horizonotalView = 7-boardCol;
+                    verticleView = squareRow;
+                }
+
                 //Figure out Chess Piece
-                ChessPiece currentPiece = matrix[7-squareRow][boardCol];
+                ChessPiece currentPiece = matrix[verticleView][horizonotalView];
                 String type = " ";
                 if (currentPiece != null){
                     ChessPiece.PieceType pieceType = currentPiece.getPieceType();
@@ -272,14 +212,5 @@ public class DrawBoard {
     private static void setDarkGrey(PrintStream out){
         out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_LIGHT_GREY);
-    }
-
-    private static void printPlayer(PrintStream out, String player) {
-        out.print(SET_BG_COLOR_WHITE);
-        out.print(SET_TEXT_COLOR_BLACK);
-
-        out.print(player);
-
-        setWhite(out);
     }
 }
