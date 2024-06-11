@@ -13,6 +13,7 @@ public class ChessClient {
     private ServerFacade server;
     private String serverUrl;
     private Repl repl;
+    private int currentGameID;
 
     State state = State.LOGGED_OUT;
     String authToken = null;
@@ -30,8 +31,14 @@ public class ChessClient {
         if (state == State.LOGGED_OUT) {
             return evalLoggedOut(input);
         }
-        else {
+        else if (state == State.LOGGED_IN) {
             return evalLoggedIn(input);
+        }
+        else if (state == State.PLAYING_GAME) {
+            return evalPlayingGame(input);
+        }
+        else {
+            return evalObservingGame(input);
         }
     }
 
@@ -64,6 +71,33 @@ public class ChessClient {
                 case "logout" -> logOut();
                 case "quit" -> "quit";
                 default -> help();
+            };
+        } catch (ResponseException ex) {
+            return ex.getMessage();
+        }
+    }
+
+    public String evalPlayingGame(String input) {
+        try {
+            var tokens = input.split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "Redraw Board" -> redrawGameBoard();
+                default -> help();
+            };
+        } catch (ResponseException ex) {
+            return ex.getMessage();
+        }
+    }
+
+    public String evalObservingGame(String input) {
+        try {
+            var tokens = input.split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "Redraw Board" -> redrawGameBoard();default -> help();
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
@@ -130,6 +164,8 @@ public class ChessClient {
             ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(id));
             ChessPiece[][] matrix = chessBoard.squares;
             drawBoard.run(matrix);
+            state = State.PLAYING_GAME;
+            currentGameID = id;
             return String.format("Joined Game");
         }
         throw new ResponseException("<ID> [WHITE|BLACK]");
@@ -142,6 +178,8 @@ public class ChessClient {
             ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(id));
             ChessPiece[][] matrix = chessBoard.squares;
             drawBoard.run(matrix);
+            state = State.OBSERVING_GAME;
+            currentGameID = id;
             return String.format("Observing Game %d", id);
         }
         throw new ResponseException("<ID>");
@@ -155,6 +193,13 @@ public class ChessClient {
         return String.format("You are logged out");
     }
 
+    public String redrawGameBoard() throws ResponseException {
+        ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(currentGameID));
+        ChessPiece[][] matrix = chessBoard.squares;
+        drawBoard.run(matrix);
+        return ("Redrew Board");
+    }
+
     public String help(){
         if (state == State.LOGGED_OUT) {
             return """
@@ -163,8 +208,8 @@ public class ChessClient {
                     3. quit - playing chess
                     4. help - with possible commands
                     """;
-        }
-        return """
+        } else if (state == State.LOGGED_IN) {
+            return """
                 1. create <NAME> - a game
                 2. list - games
                 3. join <ID> [WHITE|BLACK] - a game
@@ -173,6 +218,23 @@ public class ChessClient {
                 6. quit - playing chess
                 7. help - with possible commands
                 """;
+        } else if (state == State.PLAYING_GAME) {
+            return """
+                1. Redraw Board - Shows Board Again
+                2. leave - the game
+                3. Make Move <CHESSMOVE> - move a piece
+                4. resign - forfeit the game
+                5. Highlight Legal Moves - shows legal moves on board
+                7. help - with possible commands
+                """;
+        } else {
+            return """
+                1. Redraw Board - Shows Board Again
+                2. leave - the game
+                3. help - with possible commands
+                """;
+        }
+
     }
 
     private void assertLoggedIn() throws ResponseException {

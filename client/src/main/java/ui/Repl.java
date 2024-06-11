@@ -2,8 +2,6 @@ package ui;
 
 import java.util.Scanner;
 
-import static java.awt.Color.*;
-
 public class Repl {
     private final ChessClient client;
 
