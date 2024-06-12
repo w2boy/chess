@@ -8,14 +8,17 @@ import java.io.*;
 import java.net.*;
 import java.util.List;
 import model.*;
+import server.Server;
 
 public class ServerFacade {
 
     private final String serverUrl;
     private ClientCommunicator clientCommunicator = new ClientCommunicator();
+    private WebsocketCommunicator websocketCommunicator;
 
-    public ServerFacade(String url) {
+    public ServerFacade(String url, ServerMessageObserver observer) throws Exception {
         serverUrl = url;
+        websocketCommunicator = new WebsocketCommunicator(observer);
     }
 
     public ClearResult clearAllData() throws ResponseException {

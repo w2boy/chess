@@ -5,10 +5,11 @@ import chess.ChessPiece;
 import com.google.gson.Gson;
 import model.*;
 import model.UserData;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageObserver {
     private final DrawBoard drawBoard = new DrawBoard();
     private ServerFacade server;
     private String serverUrl;
@@ -19,9 +20,17 @@ public class ChessClient {
     String authToken = null;
 
     public ChessClient(String serverUrl, Repl repl) {
-        server = new ServerFacade(serverUrl);
+        server = new ServerFacade(serverUrl, this);
         this.serverUrl = serverUrl;
         this.repl = repl;
+    }
+
+    public void receiveNotification(ServerMessage message){
+        switch (message.getServerMessageType()) {
+//            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
+//            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
+//            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+        }
     }
 
     public String eval(String input) {
@@ -97,7 +106,8 @@ public class ChessClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "Redraw Board" -> redrawGameBoard();default -> help();
+                case "Redraw Board" -> redrawGameBoard();
+                default -> help();
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
@@ -220,18 +230,19 @@ public class ChessClient {
                 """;
         } else if (state == State.PLAYING_GAME) {
             return """
-                1. Redraw Board - Shows Board Again
+                1. Redraw Board - shows board again
                 2. leave - the game
                 3. Make Move <CHESSMOVE> - move a piece
                 4. resign - forfeit the game
-                5. Highlight Legal Moves - shows legal moves on board
+                5. Highlight Legal Moves - of piece
                 7. help - with possible commands
                 """;
         } else {
             return """
-                1. Redraw Board - Shows Board Again
+                1. Redraw Board - shows board again
                 2. leave - the game
-                3. help - with possible commands
+                3. Highlight Legal Moves - of piece
+                4. help - with possible commands
                 """;
         }
 
