@@ -1,11 +1,11 @@
 package ui;
 
+import websocket.commands.*;
 import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.net.URI;
-import java.util.Scanner;
 import com.google.gson.Gson;
 
 public class WebsocketCommunicator extends Endpoint {
@@ -30,28 +30,36 @@ public class WebsocketCommunicator extends Endpoint {
                     }
                 }
             });
-        } catch(Exception ex) {
+        } catch (Exception ex) {
 
         }
     }
 
-//    public static void main(String[] args) throws Exception {
-//        var ws = new WebsocketCommunicator(this);
-//        Scanner scanner = new Scanner(System.in);
-//
-//        System.out.println("Enter a message you want to echo");
-//        while (true) ws.send(scanner.nextLine());
-//    }
+    public void send(UserGameCommand userGameCommand) {
+        try {
+            String msg = null;
+            switch (userGameCommand.getCommandType()) {
+                case CONNECT:
+                    msg = new Gson().toJson(msg, ConnectCommand.class);
+                    break;
+                case LEAVE:
+                    msg = new Gson().toJson(msg, LeaveCommand.class);
+                    break;
+                case MAKE_MOVE:
+                    msg = new Gson().toJson(msg, MakeMoveCommand.class);
+                    break;
+                case RESIGN:
+                    msg = new Gson().toJson(msg, ResignCommand.class);
+                    break;
+            }
+            this.session.getBasicRemote().sendText(msg);
+        } catch (Exception ex) {
+            observer.receiveNotification(new ErrorMessage(ex.getMessage()));
+        }
 
-    public void send(String msg) throws Exception {
-        this.session.getBasicRemote().sendText(msg);
     }
 
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-    }
-
-    public void function(){
-        observer.receiveNotification(new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION));
     }
 
 }

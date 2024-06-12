@@ -96,5 +96,9 @@ public class SQLAuthDAO {
         }
     }
 
+    public String getUsername(String authToken) throws DataAccessException {
+        AuthData authData = getAuth(authToken);
+        return authData.username();
+    }
 
 }

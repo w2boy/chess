@@ -185,4 +185,21 @@ public class SQLGameDAO {
         ChessGame chessGame = new Gson().fromJson(chessGameJson, ChessGame.class);
         return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), chessGame);
     }
+
+    public GameData getGame(int gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT game FROM game_table WHERE game_id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, Integer.toString(gameID));
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), null);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+    }
 }

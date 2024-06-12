@@ -19,7 +19,7 @@ public class Server {
     private SQLUserDAO userSQLDAO = new SQLUserDAO();
     private SQLGameDAO gameSQLDAO = new SQLGameDAO();
 
-    private WebsocketRequestHandler websocketRequestHandler = new WebsocketRequestHandler();
+    private WebsocketRequestHandler websocketRequestHandler = new WebsocketRequestHandler(authSQLDAO, gameSQLDAO);
 
     public Server(){
         this.clearService = new ClearService();

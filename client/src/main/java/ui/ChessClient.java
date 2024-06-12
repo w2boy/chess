@@ -171,6 +171,7 @@ public class ChessClient implements ServerMessageObserver {
             String color = params[1];
             JoinGameRequest joinGameRequest = new JoinGameRequest (color, id);
             JoinGameResult joingameResult = server.joinGame(joinGameRequest, authToken);
+            server.joinGameWebsocket(authToken, id);
             ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(id));
             ChessPiece[][] matrix = chessBoard.squares;
             drawBoard.run(matrix);

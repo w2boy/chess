@@ -7,18 +7,21 @@ import model.UserData;
 import java.io.*;
 import java.net.*;
 import java.util.List;
+import java.util.Scanner;
+
 import model.*;
 import server.Server;
+import websocket.commands.ConnectCommand;
 
 public class ServerFacade {
 
     private final String serverUrl;
     private ClientCommunicator clientCommunicator = new ClientCommunicator();
-    private WebsocketCommunicator websocketCommunicator;
+    private ServerMessageObserver observer;
 
-    public ServerFacade(String url, ServerMessageObserver observer) {
+    public ServerFacade(String url, ServerMessageObserver serverMessageObserver) {
         serverUrl = url;
-        websocketCommunicator = new WebsocketCommunicator(observer);
+        this.observer = serverMessageObserver;
     }
 
     public ClearResult clearAllData() throws ResponseException {
@@ -61,8 +64,15 @@ public class ServerFacade {
         return clientCommunicator.makeRequest("PUT", path, joinGameRequest, JoinGameResult.class, serverUrl, authToken);
     }
 
+    public void joinGameWebsocket(String authToken, int gameID){
+        var ws = new WebsocketCommunicator(observer);
+
+        ws.send(new ConnectCommand(authToken, gameID));
+    }
+
     public ChessBoard getGameBoard(GetBoardRequest getBoardRequest) throws ResponseException {
         var path = "/game/board";
         return clientCommunicator.makeRequest("PUT", path, getBoardRequest, ChessBoard.class, serverUrl, null);
     }
+
 }
