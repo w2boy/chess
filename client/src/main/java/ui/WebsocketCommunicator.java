@@ -13,22 +13,26 @@ public class WebsocketCommunicator extends Endpoint {
     ServerMessageObserver observer;
     public Session session;
 
-    public WebsocketCommunicator(ServerMessageObserver serverMessageObserver) throws Exception {
-        observer = serverMessageObserver;
-        URI uri = new URI("ws://localhost:8080/ws");
-        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        this.session = container.connectToServer(this, uri);
+    public WebsocketCommunicator(ServerMessageObserver serverMessageObserver) {
+        try {
+            observer = serverMessageObserver;
+            URI uri = new URI("ws://localhost:8080/ws");
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, uri);
 
-        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-            public void onMessage(String message) {
-                try {
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    observer.receiveNotification(serverMessage);
-                } catch(Exception ex) {
-                    observer.notify(new ErrorMessage(ex.getMessage()));
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                public void onMessage(String message) {
+                    try {
+                        ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+                        observer.receiveNotification(serverMessage);
+                    } catch(Exception ex) {
+                        observer.receiveNotification(new ErrorMessage(ex.getMessage()));
+                    }
                 }
-            }
-        });
+            });
+        } catch(Exception ex) {
+
+        }
     }
 
 //    public static void main(String[] args) throws Exception {

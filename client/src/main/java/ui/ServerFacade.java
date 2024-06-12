@@ -16,7 +16,7 @@ public class ServerFacade {
     private ClientCommunicator clientCommunicator = new ClientCommunicator();
     private WebsocketCommunicator websocketCommunicator;
 
-    public ServerFacade(String url, ServerMessageObserver observer) throws Exception {
+    public ServerFacade(String url, ServerMessageObserver observer) {
         serverUrl = url;
         websocketCommunicator = new WebsocketCommunicator(observer);
     }
