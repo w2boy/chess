@@ -97,10 +97,10 @@ public class ChessClient implements ServerMessageObserver {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "Redraw Board" -> redrawGameBoard();
+                case "redraw" -> loadGame();
                 default -> help();
             };
-        } catch (ResponseException ex) {
+        } catch (Exception ex) {
             return ex.getMessage();
         }
     }
@@ -111,10 +111,10 @@ public class ChessClient implements ServerMessageObserver {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "Redraw Board" -> redrawGameBoard();
+                case "redraw" -> loadGame();
                 default -> help();
             };
-        } catch (ResponseException ex) {
+        } catch (Exception ex) {
             return ex.getMessage();
         }
     }
@@ -232,7 +232,7 @@ public class ChessClient implements ServerMessageObserver {
                 """;
         } else if (state == State.PLAYING_GAME) {
             return """
-                1. Redraw Board - shows board again
+                1. redraw - the  board
                 2. leave - the game
                 3. Make Move <CHESSMOVE> - move a piece
                 4. resign - forfeit the game
@@ -241,7 +241,7 @@ public class ChessClient implements ServerMessageObserver {
                 """;
         } else {
             return """
-                1. Redraw Board - shows board again
+                1. redraw - the board
                 2. leave - the game
                 3. Highlight Legal Moves - of piece
                 4. help - with possible commands
@@ -270,7 +270,7 @@ public class ChessClient implements ServerMessageObserver {
         System.out.println(errorMessage.getErrorMessage());
     }
 
-    private void loadGame() {
+    private String loadGame() {
         try {
             ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(currentGameID));
             ChessPiece[][] matrix = chessBoard.squares;
@@ -284,5 +284,6 @@ public class ChessClient implements ServerMessageObserver {
         } catch (Exception ex) {
             System.out.println("Error loading game: " + ex.getMessage());
         }
+        return "";
     }
 }
