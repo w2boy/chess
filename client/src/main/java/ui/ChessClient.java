@@ -1,10 +1,14 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessPiece;
 import com.google.gson.Gson;
 import model.*;
 import model.UserData;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
@@ -15,6 +19,7 @@ public class ChessClient implements ServerMessageObserver {
     private String serverUrl;
     private Repl repl;
     private int currentGameID;
+    private String currentTeamColor;
 
     State state = State.LOGGED_OUT;
     String authToken = null;
@@ -27,9 +32,9 @@ public class ChessClient implements ServerMessageObserver {
 
     public void receiveNotification(ServerMessage message){
         switch (message.getServerMessageType()) {
-//            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
-//            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
-//            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+            case NOTIFICATION -> displayNotification((NotificationMessage) message);
+            case ERROR -> displayError(((ErrorMessage) message));
+            case LOAD_GAME -> loadGame();
         }
     }
 
@@ -171,12 +176,10 @@ public class ChessClient implements ServerMessageObserver {
             String color = params[1];
             JoinGameRequest joinGameRequest = new JoinGameRequest (color, id);
             JoinGameResult joingameResult = server.joinGame(joinGameRequest, authToken);
-            server.joinGameWebsocket(authToken, id);
-            ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(id));
-            ChessPiece[][] matrix = chessBoard.squares;
-            drawBoard.run(matrix);
-            state = State.PLAYING_GAME;
             currentGameID = id;
+            currentTeamColor = color;
+            server.joinGameWebsocket(authToken, id);
+            state = State.PLAYING_GAME;
             return String.format("Joined Game");
         }
         throw new ResponseException("<ID> [WHITE|BLACK]");
@@ -186,9 +189,7 @@ public class ChessClient implements ServerMessageObserver {
         assertLoggedIn();
         if (params.length == 1) {
             int id = Integer.parseInt(params[0]);
-            ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(id));
-            ChessPiece[][] matrix = chessBoard.squares;
-            drawBoard.run(matrix);
+            server.joinGameWebsocket(authToken, id);
             state = State.OBSERVING_GAME;
             currentGameID = id;
             return String.format("Observing Game %d", id);
@@ -207,7 +208,7 @@ public class ChessClient implements ServerMessageObserver {
     public String redrawGameBoard() throws ResponseException {
         ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(currentGameID));
         ChessPiece[][] matrix = chessBoard.squares;
-        drawBoard.run(matrix);
+        drawBoard.run(matrix, currentTeamColor);
         return ("Redrew Board");
     }
 
@@ -258,6 +259,24 @@ public class ChessClient implements ServerMessageObserver {
     private void assertLoggedOut() throws ResponseException {
         if (state == State.LOGGED_IN) {
             throw new ResponseException("You are already logged in");
+        }
+    }
+
+    private void displayNotification(NotificationMessage notificationMessage) {
+        System.out.println(notificationMessage.getMessage());
+    }
+
+    private void displayError(ErrorMessage errorMessage) {
+        System.out.println(errorMessage.getErrorMessage());
+    }
+
+    private void loadGame() {
+        try {
+            ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(currentGameID));
+            ChessPiece[][] matrix = chessBoard.squares;
+            drawBoard.run(matrix, currentTeamColor);
+        } catch (Exception ex) {
+            System.out.println("Error loading game: " + ex.getMessage());
         }
     }
 }

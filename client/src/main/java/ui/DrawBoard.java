@@ -20,21 +20,22 @@ public class DrawBoard {
     private static Random rand = new Random();
 
 
-    public void run(ChessPiece[][] matrix) {
+    public void run(ChessPiece[][] matrix, String color) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
 
-        drawHeaders(out, new String[] { "a", "b", "c", "d", "e", "f", "g", "h" });
+        if (color.equals("WHITE")){
 
-        drawChessBoardWhite(out, matrix);
+            drawHeaders(out, new String[] { "a", "b", "c", "d", "e", "f", "g", "h" });
 
-        out.println();
-        out.println();
+            drawChessBoardWhite(out, matrix);
+        } else if (color.equals("BLACK")){
 
-        drawHeaders(out, new String[] { "h", "g", "f", "e", "d", "c", "b", "a" });
+            drawHeaders(out, new String[] { "h", "g", "f", "e", "d", "c", "b", "a" });
 
-        drawChessBoardBlack(out, matrix);
+            drawChessBoardBlack(out, matrix);
+        }
 
         setDarkGrey(out);
     }

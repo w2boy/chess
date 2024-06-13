@@ -19,7 +19,7 @@ public class ServerFacadeTests {
         int port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         String serverUrl = "http://localhost:" + Integer.toString(port);
-        facade = new ServerFacade(serverUrl);
+        facade = new ServerFacade(serverUrl, new ChessClient(serverUrl, new Repl(serverUrl)));
     }
 
     @BeforeEach

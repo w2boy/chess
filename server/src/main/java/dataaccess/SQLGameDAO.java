@@ -190,7 +190,8 @@ public class SQLGameDAO {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT game FROM game_table WHERE game_id=?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, Integer.toString(gameID));
+                String gID = Integer.toString(gameID);
+                ps.setString(1, gID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), null);

@@ -112,7 +112,7 @@ public class WebsocketRequestHandler {
     void connect(Session session, Integer gameID, String username, String color, ConnectCommand connectCommand){
         sendMessage(session, new LoadGameMessage("game"));
 
-        // Cycle through the maps
+        // Cycle through the maps and send notifications to other sessions in game.
         for (Map.Entry<Integer, Session> entry : sessionMap.entrySet()) {
             if (entry.getKey().equals(gameID)) {
                 Session otherSession = entry.getValue();
