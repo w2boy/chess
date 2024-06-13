@@ -7,8 +7,6 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import service.LoginRequest;
-import spark.Spark;
 import websocket.commands.*;
 import websocket.messages.*;
 
@@ -36,6 +34,7 @@ public class WebsocketRequestHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
+        System.out.println(msg);
         String color = null;
         try {
             UserGameCommand command = new Gson().fromJson(msg, UserGameCommand.class);
@@ -71,7 +70,7 @@ public class WebsocketRequestHandler {
     }
 
     void sendMessage(Session session, ServerMessage serverMessage){
-        String stringServerMessage = new Gson().toJson(serverMessage, ErrorMessage.class);
+        String stringServerMessage = new Gson().toJson(serverMessage);
         try {
             session.getRemote().sendString(stringServerMessage);
         } catch (Exception ex) {

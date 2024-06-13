@@ -188,13 +188,14 @@ public class SQLGameDAO {
 
     public GameData getGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT game FROM game_table WHERE game_id=?";
+            var statement = "SELECT game_id, white_username, black_username, game_name, game FROM game_table WHERE game_id=?";
             try (var ps = conn.prepareStatement(statement)) {
-                String gID = Integer.toString(gameID);
-                ps.setString(1, gID);
+                ps.setString(1, Integer.toString(gameID));
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), null);
+                        String chessGameJson = rs.getString("game");
+                        ChessGame game = new Gson().fromJson(chessGameJson, ChessGame.class);
+                        return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), game);
                     }
                 }
             }

@@ -40,16 +40,16 @@ public class WebsocketCommunicator extends Endpoint {
             String msg = null;
             switch (userGameCommand.getCommandType()) {
                 case CONNECT:
-                    msg = new Gson().toJson(msg, ConnectCommand.class);
+                    msg = new Gson().toJson(userGameCommand);
                     break;
                 case LEAVE:
-                    msg = new Gson().toJson(msg, LeaveCommand.class);
+                    msg = new Gson().toJson(userGameCommand);
                     break;
                 case MAKE_MOVE:
-                    msg = new Gson().toJson(msg, MakeMoveCommand.class);
+                    msg = new Gson().toJson(userGameCommand);
                     break;
                 case RESIGN:
-                    msg = new Gson().toJson(msg, ResignCommand.class);
+                    msg = new Gson().toJson(userGameCommand);
                     break;
             }
             this.session.getBasicRemote().sendText(msg);
