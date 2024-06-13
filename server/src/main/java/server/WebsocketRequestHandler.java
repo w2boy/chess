@@ -34,7 +34,7 @@ public class WebsocketRequestHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
-        System.out.println(msg);
+        // System.out.println(msg);
         String color = null;
         try {
             UserGameCommand command = new Gson().fromJson(msg, UserGameCommand.class);
@@ -94,11 +94,15 @@ public class WebsocketRequestHandler {
         String color = "observer";
         try {
             GameData gameData = sqlGameDAO.getGame(gameID);
-            if (gameData.whiteUsername().equals(username)){
-                color = "white";
+            if (gameData.whiteUsername() != null){
+                if (gameData.whiteUsername().equals(username)){
+                    color = "white";
+                }
             }
-            else if (gameData.blackUsername().equals(username)){
-                color = "black";
+            else if (gameData.blackUsername() != null){
+                if (gameData.blackUsername().equals(username)){
+                    color = "black";
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();

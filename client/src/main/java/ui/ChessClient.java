@@ -274,7 +274,13 @@ public class ChessClient implements ServerMessageObserver {
         try {
             ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(currentGameID));
             ChessPiece[][] matrix = chessBoard.squares;
-            drawBoard.run(matrix, currentTeamColor);
+
+            // If currentTeamColor is null, then the client is observing and should see the board as white.
+            if (currentTeamColor == null){
+                drawBoard.run(matrix, "WHITE");
+            } else {
+                drawBoard.run(matrix, currentTeamColor);
+            }
         } catch (Exception ex) {
             System.out.println("Error loading game: " + ex.getMessage());
         }

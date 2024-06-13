@@ -25,6 +25,8 @@ public class DrawBoard {
 
         out.print(ERASE_SCREEN);
 
+        out.println();
+
         if (color.equals("WHITE")){
 
             drawHeaders(out, new String[] { "a", "b", "c", "d", "e", "f", "g", "h" });
