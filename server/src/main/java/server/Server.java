@@ -19,7 +19,7 @@ public class Server {
     private SQLUserDAO userSQLDAO = new SQLUserDAO();
     private SQLGameDAO gameSQLDAO = new SQLGameDAO();
 
-    private WebsocketRequestHandler websocketRequestHandler = new WebsocketRequestHandler(authSQLDAO, gameSQLDAO);
+    private WebsocketRequestHandler websocketRequestHandler = new WebsocketRequestHandler();
 
     public Server(){
         this.clearService = new ClearService();
@@ -31,15 +31,19 @@ public class Server {
 
         try{
             DatabaseManager.createDatabase();
+            websocketRequestHandler.setAuthDAO(authSQLDAO);
+            websocketRequestHandler.setGameDAO(gameSQLDAO);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Spark.port(desiredPort);
 
+        Spark.webSocket("/ws", WebsocketRequestHandler.class);
+
         Spark.staticFiles.location("web");
 
-        Spark.init();
+
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clearAllData);

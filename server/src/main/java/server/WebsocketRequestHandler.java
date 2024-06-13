@@ -24,15 +24,14 @@ public class WebsocketRequestHandler {
     Map<Integer, Session> sessionMap = new HashMap<>();
     Map<Integer, String> usernameMap = new HashMap<>();
 
-    WebsocketRequestHandler(SQLAuthDAO authDAO, SQLGameDAO gameDAO) {
-        this.sqlAuthDAO = authDAO;
+    WebsocketRequestHandler() {}
+
+    public void setGameDAO(SQLGameDAO gameDAO){
         this.sqlGameDAO = gameDAO;
     }
 
-    public static void main(String[] args) {
-        Spark.port(8080);
-        Spark.webSocket("/ws", WebsocketRequestHandler.class);
-        Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
+    public void setAuthDAO(SQLAuthDAO authDAO){
+        this.sqlAuthDAO = authDAO;
     }
 
     @OnWebSocketMessage
