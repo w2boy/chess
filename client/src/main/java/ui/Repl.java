@@ -2,6 +2,8 @@ package ui;
 
 import java.util.Scanner;
 
+import static java.lang.Thread.sleep;
+
 public class Repl {
     private final ChessClient client;
 
@@ -15,29 +17,39 @@ public class Repl {
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
-        var result = "";
-        while (!result.equals("quit")) {
-            printPrompt();
-            String line = scanner.nextLine();
+        try {
+            var result = "";
+            while (!result.equals("quit")) {
+                sleep(400);
+                printPrompt();
+                String line = scanner.nextLine();
 
-            try {
+                try {
 
-                result = client.eval(line);
-                System.out.print(result);
-            } catch (Throwable e) {
-                var msg = e.toString();
-                System.out.print(msg);
+                    result = client.eval(line);
+                    System.out.print(result);
+                } catch (Throwable e) {
+                    var msg = e.toString();
+                    System.out.print(msg);
+                }
             }
+            System.out.println();
+        } catch (Exception e) {
+
         }
-        System.out.println();
+
 
     }
 
     private void printPrompt() {
         if (client.state == State.LOGGED_OUT){
             System.out.print("\n" + "Logged Out" + " >>> ");
-        } else {
+        } else if (client.state == State.LOGGED_IN){
             System.out.print("\n" + "Logged In" + " >>> ");
+        } else if (client.state == State.PLAYING_GAME){
+            System.out.print("\n" + "Playing Game" + " >>> ");
+        } else {
+            System.out.print("\n" + "Observing Game" + " >>> ");
         }
 
     }

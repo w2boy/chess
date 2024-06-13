@@ -15,9 +15,6 @@ public class DrawBoard {
     private static final int SQUARE_SIZE_IN_CHARS = 1;
     private static final int LINE_WIDTH_IN_CHARS = 1;
     private static final String EMPTY = "   ";
-    private static final String X = " X ";
-    private static final String O = " O ";
-    private static Random rand = new Random();
 
 
     public void run(ChessPiece[][] matrix, String color) {
@@ -39,7 +36,7 @@ public class DrawBoard {
             drawChessBoardBlack(out, matrix);
         }
 
-        setDarkGrey(out);
+        setDefault(out);
     }
 
     private static void drawHeaders(PrintStream out, String[] headers) {
@@ -187,5 +184,10 @@ public class DrawBoard {
     private static void setDarkGrey(PrintStream out){
         out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_LIGHT_GREY);
+    }
+
+    private static void setDefault(PrintStream out){
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 }

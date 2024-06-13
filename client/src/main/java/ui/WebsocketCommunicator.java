@@ -2,6 +2,8 @@ package ui;
 
 import websocket.commands.*;
 import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -24,7 +26,22 @@ public class WebsocketCommunicator extends Endpoint {
                 public void onMessage(String message) {
                     try {
                         ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                        observer.receiveNotification(serverMessage);
+
+                        switch (serverMessage.getServerMessageType()) {
+                            case LOAD_GAME:
+                                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                                observer.receiveNotification(loadGameMessage);
+                                break;
+                            case ERROR:
+                                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                                observer.receiveNotification(errorMessage);
+                                break;
+                            case NOTIFICATION:
+                                NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+                                observer.receiveNotification(notificationMessage);
+                                break;
+                        }
+
                     } catch(Exception ex) {
                         observer.receiveNotification(new ErrorMessage(ex.getMessage()));
                     }

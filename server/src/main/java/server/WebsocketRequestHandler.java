@@ -11,7 +11,9 @@ import websocket.commands.*;
 import websocket.messages.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @WebSocket
 public class WebsocketRequestHandler {
@@ -19,7 +21,7 @@ public class WebsocketRequestHandler {
     SQLAuthDAO sqlAuthDAO;
     SQLGameDAO sqlGameDAO;
 
-    Map<Integer, Session> sessionMap = new HashMap<>();
+    Map<Integer, Set<Session>> sessionMap = new HashMap<>();
     Map<Integer, String> usernameMap = new HashMap<>();
 
     WebsocketRequestHandler() {}
@@ -82,7 +84,10 @@ public class WebsocketRequestHandler {
 
     void saveSession(int gID, Session session){
         Integer gameID = gID;
-        sessionMap.put(gameID, session);
+        if (sessionMap.get(gameID) == null){
+            sessionMap.put(gameID, new HashSet<Session>());
+        }
+        sessionMap.get(gameID).add(session);
     }
 
     void saveUsernameToGame(int gID, String username){
@@ -115,12 +120,14 @@ public class WebsocketRequestHandler {
         sendMessage(session, new LoadGameMessage("game"));
 
         // Cycle through the maps and send notifications to other sessions in game.
-        for (Map.Entry<Integer, Session> entry : sessionMap.entrySet()) {
+        for (Map.Entry<Integer, Set<Session>> entry : sessionMap.entrySet()) {
             if (entry.getKey().equals(gameID)) {
-                Session otherSession = entry.getValue();
-                if(otherSession != session){
-                    String stringToSend = username + " joined the game as " + color;
-                    sendMessage(session, new NotificationMessage(stringToSend));
+                Set<Session> sessionsInGame = entry.getValue();
+                for (Session otherSession : sessionsInGame){
+                    if(otherSession != session){
+                        String stringToSend = username + " joined the game as " + color;
+                        sendMessage(otherSession, new NotificationMessage(stringToSend));
+                    }
                 }
             }
         }
