@@ -188,7 +188,7 @@ public class ChessClient implements ServerMessageObserver {
 
     public String makeMove(String... params) throws ResponseException {
         if (params.length == 1) {
-            return makeMoveHelper(null, params);
+            return makeMoveHelper("", params);
         } else if (params.length == 2){
             return makeMoveHelper(params[1], params);
         }
