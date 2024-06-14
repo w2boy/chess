@@ -137,22 +137,18 @@ public class WebsocketRequestHandler {
         String color = "observer";
         try {
             GameData gameData = sqlGameDAO.getGame(gameID);
-            if (gameData.whiteUsername() != null){
                 if (gameData.whiteUsername().equals(username)){
                     color = "white";
                     playerColor = ChessGame.TeamColor.WHITE;
                     oponentColor = ChessGame.TeamColor.BLACK;
                     oponentUsername = gameData.blackUsername();
                 }
-            }
-            else if (gameData.blackUsername() != null){
                 if (gameData.blackUsername().equals(username)){
                     color = "black";
                     playerColor = ChessGame.TeamColor.BLACK;
                     oponentColor = ChessGame.TeamColor.WHITE;
                     oponentUsername = gameData.whiteUsername();
                 }
-            }
         } catch (Exception ex) {
             ex.printStackTrace();
             sendMessage(session, new ErrorMessage("Error: " + ex.getMessage()));

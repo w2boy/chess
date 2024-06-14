@@ -187,18 +187,20 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     public String makeMove(String... params) throws ResponseException {
-        if (params.length >= 1) {
-            int id = currentGameID;
-            String chessMoveString = params[0];
-            String promotionPieceString = null;
-            if (params[1] != null){
-                promotionPieceString = params[1];
-            }
-            ChessMove chessMove = createMove(chessMoveString, promotionPieceString);
-            server.makeMoveWebsocket(authToken, id, chessMove);
-            return "";
+        if (params.length == 1) {
+            return makeMoveHelper(null, params);
+        } else if (params.length == 2){
+            return makeMoveHelper(params[1], params);
         }
         throw new ResponseException("makeMove <CHESS MOVE> <PROMOTION PIECE>");
+    }
+
+    public String makeMoveHelper(String promotionPieceString, String... params) throws ResponseException {
+        int id = currentGameID;
+        String chessMoveString = params[0];
+        ChessMove chessMove = createMove(chessMoveString, promotionPieceString);
+        server.makeMoveWebsocket(authToken, id, chessMove);
+        return "";
     }
 
     public ChessMove createMove(String chessMoveString, String promotionPieceString) throws ResponseException {

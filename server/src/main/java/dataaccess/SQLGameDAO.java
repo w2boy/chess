@@ -71,15 +71,15 @@ public class SQLGameDAO {
         }
         int gameID = 0;
         ChessGame chessGame = new ChessGame();
-        GameData gameData = new GameData (0, null, null, createGameRequest.gameName(), chessGame);
+        GameData gameData = new GameData (0, "empty", "empty", createGameRequest.gameName(), chessGame);
         String chessGameJson = new Gson().toJson(chessGame, ChessGame.class);
 
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "insert into game_table ( white_username, black_username, game_name, game) values (?, ?, ?, ?)";
             try (var ps = conn.prepareStatement(statement)) {
 //                ps.setInt(1, gameData.gameID());
-                ps.setString(1, null);
-                ps.setString(2, null);
+                ps.setString(1, "empty");
+                ps.setString(2, "empty");
                 ps.setString(3, gameData.gameName());
                 ps.setString(4, chessGameJson);
                 if(ps.executeUpdate() == 1) {
@@ -129,8 +129,8 @@ public class SQLGameDAO {
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         GameData gameData = readGame(rs);
-                        if (!(joinGameRequest.playerColor().equals("WHITE") && gameData.whiteUsername() == null) &&
-                                !(joinGameRequest.playerColor().equals("BLACK") && gameData.blackUsername() == null)){
+                        if (!(joinGameRequest.playerColor().equals("WHITE") && (gameData.whiteUsername().equals("empty"))) &&
+                                !(joinGameRequest.playerColor().equals("BLACK") && (gameData.blackUsername().equals("empty")))){
                             return new JoinGameResult("Error: already taken");
                         }
                     }
@@ -236,7 +236,7 @@ public class SQLGameDAO {
                         "WHERE game_id=?";
             }
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, null);
+                ps.setString(1, "empty");
                 ps.setInt(2, gameID);
                 ps.executeUpdate();
             }
