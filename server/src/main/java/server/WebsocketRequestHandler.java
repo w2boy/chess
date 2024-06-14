@@ -1,5 +1,7 @@
 package server;
 
+import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.SQLAuthDAO;
 import dataaccess.SQLGameDAO;
@@ -10,16 +12,17 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
 import websocket.messages.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @WebSocket
 public class WebsocketRequestHandler {
 
     SQLAuthDAO sqlAuthDAO;
     SQLGameDAO sqlGameDAO;
+
+    ChessGame.TeamColor playerColor = null;
+    ChessGame.TeamColor oponentColor = null;
+    String oponentUsername = null;
 
     Map<Integer, Set<Session>> sessionMap = new HashMap<>();
     Map<Session, String> usernameMap = new HashMap<>();
@@ -53,17 +56,48 @@ public class WebsocketRequestHandler {
 
                     sendMessage(session, new LoadGameMessage("game"));
                     String stringToSend = username + " joined the game as " + color;
-                    notifyOtherSessions(session, command.getGameID(), username, stringToSend);
+                    notifyOtherSessions(session, command.getGameID(), username, stringToSend, "NOTIFICATION");
                     break;
-//                case MAKE_MOVE:
-//                    makeMove(session, username, (MakeMoveCommand) command);
-//                    break;
+                case MAKE_MOVE:
+                    MakeMoveCommand makeMoveCommand = new Gson().fromJson(msg, MakeMoveCommand.class);
+                    GameData gameData = sqlGameDAO.getGame(makeMoveCommand.getGameID());
+                    findColor(command.getGameID(), username, session);
+                    if (!verifyTurn(gameData.game())){
+                        sendMessage(session, new ErrorMessage("Error: Not Your Turn!"));
+                        break;
+                    }
+                    // If the move is valid make the move and check for endgame conditions. If any endgame conditions, notify other sessions
+                    if (verifyMove(makeMoveCommand.getChessMove(), gameData.game())){
+                        ChessGame updatedGame = makeMove(gameData.game(), makeMoveCommand.getChessMove(), session, makeMoveCommand.getGameID());
+                        sendMessage(session, new LoadGameMessage("game"));
+                        stringToSend = username + " made the move " + makeMoveCommand.getChessMove().toString();
+                        notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "LOADGAME");
+                        if (updatedGame.isInCheck(oponentColor)){
+                            stringToSend = oponentUsername + " is in check!";
+                            sendMessage(session, new NotificationMessage(stringToSend));
+                            notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
+                        }
+                        if (updatedGame.isInCheckmate(oponentColor)){
+                            stringToSend = oponentUsername + " is checkmated! " + username + " wins!";
+                            sendMessage(session, new NotificationMessage(stringToSend));
+                            notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
+                        }
+                        if (updatedGame.isInStalemate(oponentColor)){
+                            stringToSend = "The game is in stalemate. It's a tie!";
+                            sendMessage(session, new NotificationMessage(stringToSend));
+                            notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
+                        }
+                    } else {
+                        sendMessage(session, new ErrorMessage("Error: INVALID MOVE"));
+                        break;
+                    }
+                    break;
                 case LEAVE:
                     LeaveCommand leaveCommand = new Gson().fromJson(msg, LeaveCommand.class);
                     color = findColor(leaveCommand.getGameID(), username, session);
                     leaveGame(leaveCommand.getGameID(), username, color, session);
                     stringToSend = username + " left the game";
-                    notifyOtherSessions(session, leaveCommand.getGameID(), username, stringToSend);
+                    notifyOtherSessions(session, leaveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
                     break;
 //                case RESIGN:
 //                    resign(session, username, (ResignCommand) command);
@@ -106,11 +140,17 @@ public class WebsocketRequestHandler {
             if (gameData.whiteUsername() != null){
                 if (gameData.whiteUsername().equals(username)){
                     color = "white";
+                    playerColor = ChessGame.TeamColor.WHITE;
+                    oponentColor = ChessGame.TeamColor.BLACK;
+                    oponentUsername = gameData.blackUsername();
                 }
             }
             else if (gameData.blackUsername() != null){
                 if (gameData.blackUsername().equals(username)){
                     color = "black";
+                    playerColor = ChessGame.TeamColor.BLACK;
+                    oponentColor = ChessGame.TeamColor.WHITE;
+                    oponentUsername = gameData.whiteUsername();
                 }
             }
         } catch (Exception ex) {
@@ -118,6 +158,33 @@ public class WebsocketRequestHandler {
             sendMessage(session, new ErrorMessage("Error: " + ex.getMessage()));
         }
         return color;
+    }
+
+    private boolean verifyTurn(ChessGame chessGame){
+        if (chessGame.getTeamTurn() == playerColor){
+            return true;
+        }
+        return false;
+    }
+
+
+    private boolean verifyMove(ChessMove chessMove, ChessGame chessGame){
+        Collection<ChessMove> validMoves = chessGame.validMoves(chessMove.getStartPosition());
+        if (validMoves.contains(chessMove)){
+            return true;
+        }
+        return false;
+    }
+
+    private ChessGame makeMove(ChessGame chessGame, ChessMove chessMove, Session session, int gameID){
+        try{
+            chessGame.makeMove(chessMove);
+            sqlGameDAO.updateGame(chessGame, gameID);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            sendMessage(session, new ErrorMessage("Error Making Move on Server Side: " + ex.getMessage()));
+        }
+        return chessGame;
     }
 
     void leaveGame(int gameID, String username, String color, Session session){
@@ -132,7 +199,7 @@ public class WebsocketRequestHandler {
         }
     }
 
-    void notifyOtherSessions(Session session, Integer gameID, String username, String stringToSend){
+    void notifyOtherSessions(Session session, Integer gameID, String username, String stringToSend, String messageType){
 
         // Cycle through the maps and send notifications to other sessions in game.
         for (Map.Entry<Integer, Set<Session>> entry : sessionMap.entrySet()) {
@@ -141,7 +208,13 @@ public class WebsocketRequestHandler {
                 for (Session otherSession : sessionsInGame){
                     String otherUsername = usernameMap.get(otherSession);
                     if(!otherUsername.equals(username)){
-                        sendMessage(otherSession, new NotificationMessage(stringToSend));
+                        if (messageType.equals("NOTIFICATION")){
+                            sendMessage(otherSession, new NotificationMessage(stringToSend));
+                        } else if (messageType.equals("LOADGAME")){
+                            sendMessage(otherSession, new LoadGameMessage("game"));
+                            sendMessage(otherSession, new NotificationMessage(stringToSend));
+                        }
+
                     }
                 }
             }

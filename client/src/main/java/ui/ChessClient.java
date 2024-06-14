@@ -194,8 +194,7 @@ public class ChessClient implements ServerMessageObserver {
             if (params[1] != null){
                 promotionPieceString = params[1];
             }
-            createMove(chessMoveString, promotionPieceString);
-            ChessMove chessMove = null;
+            ChessMove chessMove = createMove(chessMoveString, promotionPieceString);
             server.makeMoveWebsocket(authToken, id, chessMove);
             return "";
         }

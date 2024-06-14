@@ -205,22 +205,40 @@ public class SQLGameDAO {
         return null;
     }
 
+    public GameData updateGame(ChessGame chessGame, int gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "update game_table set game=? where game_id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                String updatedGame = new Gson().toJson(chessGame, ChessGame.class);
+                ps.setString(1, updatedGame);
+                ps.setInt(2, gameID);
+                if(ps.executeUpdate() == 1) {
+
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+    }
+
     public void leaveGame(int gameID, String username, String color) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             String statement = null;
             if (color.equals("white")){
                 statement = "update game_table " +
                         "set white_username=?" +
-                        "where white_username=?";
+                        "where game_id=?";
             }
             else if (color.equals("black")){
                 statement = "UPDATE game_table " +
                         "SET black_username=?" +
-                        "WHERE black_username=?";
+                        "WHERE game_id=?";
             }
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, null);
-                ps.setString(2, username);
+                ps.setInt(2, gameID);
+                ps.executeUpdate();
             }
         } catch (Exception e) {
             throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
