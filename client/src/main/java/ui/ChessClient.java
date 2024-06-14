@@ -207,35 +207,35 @@ public class ChessClient implements ServerMessageObserver {
         int firstMoveHorizontalView = -1;
         switch(chessMoveString.charAt(0)){
             case 'a':
-                firstMoveHorizontalView = 0;
-                break;
-            case 'b':
                 firstMoveHorizontalView = 1;
                 break;
-            case 'c':
+            case 'b':
                 firstMoveHorizontalView = 2;
                 break;
-            case 'd':
+            case 'c':
                 firstMoveHorizontalView = 3;
                 break;
-            case 'e':
+            case 'd':
                 firstMoveHorizontalView = 4;
                 break;
-            case 'f':
+            case 'e':
                 firstMoveHorizontalView = 5;
                 break;
-            case 'g':
+            case 'f':
                 firstMoveHorizontalView = 6;
                 break;
-            case 'h':
+            case 'g':
                 firstMoveHorizontalView = 7;
+                break;
+            case 'h':
+                firstMoveHorizontalView = 8;
                 break;
             default:
                 throw new ResponseException("INVALID CHESS MOVE");
         }
         int firstMoveVerticalView = -1;
         if (Character.isDigit(chessMoveString.charAt(1))){
-            firstMoveVerticalView = (int) chessMoveString.charAt(1);
+            firstMoveVerticalView = Character.getNumericValue(chessMoveString.charAt(1));
         } else {
             throw new ResponseException("INVALID CHESS MOVE");
         }
@@ -244,30 +244,33 @@ public class ChessClient implements ServerMessageObserver {
             case 'a':
                 secondMoveHorizontalView = 1;
                 break;
-            case 'c':
+            case 'b':
                 secondMoveHorizontalView = 2;
                 break;
-            case 'd':
+            case 'c':
                 secondMoveHorizontalView = 3;
                 break;
-            case 'e':
+            case 'd':
                 secondMoveHorizontalView = 4;
                 break;
-            case 'f':
+            case 'e':
                 secondMoveHorizontalView = 5;
                 break;
-            case 'g':
+            case 'f':
                 secondMoveHorizontalView = 6;
                 break;
-            case 'h':
+            case 'g':
                 secondMoveHorizontalView = 7;
+                break;
+            case 'h':
+                secondMoveHorizontalView = 8;
                 break;
             default:
                 throw new ResponseException("INVALID CHESS MOVE");
         }
         int secondMoveVerticalView = -1;
         if (Character.isDigit(chessMoveString.charAt(3))){
-            secondMoveVerticalView = (int) chessMoveString.charAt(3);
+            secondMoveVerticalView = Character.getNumericValue(chessMoveString.charAt(3));
         } else {
             throw new ResponseException("INVALID CHESS MOVE");
         }

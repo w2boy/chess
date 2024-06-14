@@ -84,6 +84,9 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> moves = new ArrayList<ChessMove>();
         ChessPiece myPiece = this.board.getPiece(startPosition);
+        if (myPiece == null){
+            return moves;
+        }
         TeamColor myColor = myPiece.getTeamColor();
 
         Collection<ChessMove> validMoves = myPiece.pieceMoves(this.board, startPosition);
