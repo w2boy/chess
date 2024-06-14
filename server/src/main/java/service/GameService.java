@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
@@ -33,4 +34,8 @@ public class GameService {
     public ChessBoard getGameBoard(SQLGameDAO gameDAO, GetBoardRequest getBoardRequest) throws DataAccessException {
         return gameDAO.getGameBoard( getBoardRequest);
     }
+    public ChessGame getGame(SQLGameDAO gameDAO, GetBoardRequest getBoardRequest) throws DataAccessException {
+        return gameDAO.getGame(getBoardRequest.gameID()).game();
+    }
+
 }

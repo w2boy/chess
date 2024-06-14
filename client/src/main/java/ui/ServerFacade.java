@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import model.UserData;
@@ -95,6 +96,11 @@ public class ServerFacade {
     public ChessBoard getGameBoard(GetBoardRequest getBoardRequest) throws ResponseException {
         var path = "/game/board";
         return clientCommunicator.makeRequest("PUT", path, getBoardRequest, ChessBoard.class, serverUrl, null);
+    }
+
+    public ChessGame getGame(GetBoardRequest getBoardRequest) throws ResponseException {
+        var path = "/game/getgame";
+        return clientCommunicator.makeRequest("PUT", path, getBoardRequest, ChessGame.class, serverUrl, null);
     }
 
 }

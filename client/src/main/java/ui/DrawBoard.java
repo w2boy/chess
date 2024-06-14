@@ -1,10 +1,13 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Random;
 
 import static ui.EscapeSequences.*;
@@ -17,7 +20,7 @@ public class DrawBoard {
     private static final String EMPTY = "   ";
 
 
-    public void run(ChessPiece[][] matrix, String color) {
+    public void run(ChessPiece[][] matrix, String color, Collection<ChessMove> validMoves) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -28,12 +31,12 @@ public class DrawBoard {
 
             drawHeaders(out, new String[] { "a", "b", "c", "d", "e", "f", "g", "h" });
 
-            drawChessBoardWhite(out, matrix);
+            drawChessBoardWhite(out, matrix, validMoves);
         } else if (color.equals("BLACK")){
 
             drawHeaders(out, new String[] { "h", "g", "f", "e", "d", "c", "b", "a" });
 
-            drawChessBoardBlack(out, matrix);
+            drawChessBoardBlack(out, matrix, validMoves);
         }
 
         setDefault(out);
@@ -63,17 +66,17 @@ public class DrawBoard {
         out.println();
     }
 
-    private static void drawChessBoardWhite(PrintStream out, ChessPiece[][] matrix) {
-            drawSquares(out, matrix, "WHITE");
+    private static void drawChessBoardWhite(PrintStream out, ChessPiece[][] matrix, Collection<ChessMove> validMoves) {
+            drawSquares(out, matrix, "WHITE", validMoves);
             setDarkGrey(out);
     }
 
-    private static void drawChessBoardBlack(PrintStream out, ChessPiece[][] matrix) {
-        drawSquares(out, matrix, "BLACK");
+    private static void drawChessBoardBlack(PrintStream out, ChessPiece[][] matrix, Collection<ChessMove> validMoves) {
+        drawSquares(out, matrix, "BLACK", validMoves);
         setDarkGrey(out);
     }
 
-    private static void drawSquares(PrintStream out, ChessPiece[][] matrix, String color) {
+    private static void drawSquares(PrintStream out, ChessPiece[][] matrix, String color, Collection<ChessMove> validMoves) {
 
         setDarkGrey(out);
 
@@ -141,6 +144,10 @@ public class DrawBoard {
                         setBlack(out);
                     }
 
+                    if (validMoves != null && validMoveSpace(new ChessPosition(squareRow+1, boardCol+1), validMoves)){
+                        setBlue(out);
+                    }
+
                     out.print(" ");
                     out.print(type);
                     out.print(" ");
@@ -153,6 +160,8 @@ public class DrawBoard {
                         setWhite(out);
                     }
 
+                    if (validMoves != null && validMoveSpace(new ChessPosition(squareRow+1, boardCol+1), validMoves)){setBlue(out);}
+
                     out.print(" ");
                     out.print(type);
                     out.print(" ");
@@ -163,6 +172,15 @@ public class DrawBoard {
 
             out.println();
         }
+    }
+
+    public static boolean validMoveSpace(ChessPosition spacePosition, Collection<ChessMove> validMoves){
+        for (ChessMove validMove : validMoves){
+            if (validMove.getStartPosition() == spacePosition){
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void setWhite(PrintStream out) {
@@ -179,6 +197,10 @@ public class DrawBoard {
 
     private static void setBlack(PrintStream out) {
         out.print(SET_BG_COLOR_BLACK);
+    }
+
+    private static void setBlue(PrintStream out) {
+        out.print(SET_BG_COLOR_BLUE);
     }
 
     private static void setDarkGrey(PrintStream out){

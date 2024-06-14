@@ -10,6 +10,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -105,6 +106,7 @@ public class ChessClient implements ServerMessageObserver {
                 case "leave" -> leaveGame();
                 case "resign" -> resignGame();
                 case "makeMove" -> makeMove(params);
+                case "legalMoves" -> highlightLegalMoves(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -120,6 +122,7 @@ public class ChessClient implements ServerMessageObserver {
             return switch (cmd) {
                 case "redraw" -> loadGame();
                 case "leave" -> leaveGame();
+                case "legalMoves" -> highlightLegalMoves(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -195,7 +198,7 @@ public class ChessClient implements ServerMessageObserver {
         assertLoggedIn();
         if (params.length == 2) {
             int id = Integer.parseInt(params[0]);
-            if (history.contains(id)){
+            if (history != null && history.contains(id)){
                 state = State.GAME_ENDED;
                 return "";
             }
@@ -229,41 +232,6 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     public ChessMove createMove(String chessMoveString, String promotionPieceString) throws ResponseException {
-        int firstMoveHorizontalView = -1;
-        switch(chessMoveString.charAt(0)){
-            case 'a':
-                firstMoveHorizontalView = 1;
-                break;
-            case 'b':
-                firstMoveHorizontalView = 2;
-                break;
-            case 'c':
-                firstMoveHorizontalView = 3;
-                break;
-            case 'd':
-                firstMoveHorizontalView = 4;
-                break;
-            case 'e':
-                firstMoveHorizontalView = 5;
-                break;
-            case 'f':
-                firstMoveHorizontalView = 6;
-                break;
-            case 'g':
-                firstMoveHorizontalView = 7;
-                break;
-            case 'h':
-                firstMoveHorizontalView = 8;
-                break;
-            default:
-                throw new ResponseException("INVALID CHESS MOVE");
-        }
-        int firstMoveVerticalView = -1;
-        if (Character.isDigit(chessMoveString.charAt(1))){
-            firstMoveVerticalView = Character.getNumericValue(chessMoveString.charAt(1));
-        } else {
-            throw new ResponseException("INVALID CHESS MOVE");
-        }
         int secondMoveHorizontalView = -1;
         switch(chessMoveString.charAt(2)){
             case 'a':
@@ -314,9 +282,69 @@ public class ChessClient implements ServerMessageObserver {
                 promotionPieceType = ChessPiece.PieceType.KNIGHT;
                 break;
         }
-        ChessPosition startPosition = new ChessPosition(firstMoveVerticalView, firstMoveHorizontalView);
+        ChessPosition startPosition = getStartPosition(chessMoveString);
         ChessPosition endPosition = new ChessPosition(secondMoveVerticalView, secondMoveHorizontalView);
         return new ChessMove(startPosition, endPosition, promotionPieceType);
+    }
+
+    public String highlightLegalMoves(String... params){
+        try {
+            ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(currentGameID));
+            ChessPiece[][] matrix = chessBoard.squares;
+            ChessGame chessGame = server.getGame(new GetBoardRequest(currentGameID));
+            ChessPosition startPosition = getStartPosition(params[0]);
+            Collection<ChessMove> validMoves = chessGame.validMoves(startPosition);
+
+            // If currentTeamColor is null, then the client is observing and should see the board as white.
+            if (currentTeamColor == null){
+                drawBoard.run(matrix, "WHITE", validMoves);
+            } else {
+                drawBoard.run(matrix, currentTeamColor, validMoves);
+            }
+        } catch (Exception ex) {
+            System.out.println("Error loading game: " + ex.getMessage());
+        }
+        return "";
+    }
+
+    public ChessPosition getStartPosition(String chessMoveString) throws ResponseException {
+        int firstMoveHorizontalView = -1;
+        switch(chessMoveString.charAt(0)){
+            case 'a':
+                firstMoveHorizontalView = 1;
+                break;
+            case 'b':
+                firstMoveHorizontalView = 2;
+                break;
+            case 'c':
+                firstMoveHorizontalView = 3;
+                break;
+            case 'd':
+                firstMoveHorizontalView = 4;
+                break;
+            case 'e':
+                firstMoveHorizontalView = 5;
+                break;
+            case 'f':
+                firstMoveHorizontalView = 6;
+                break;
+            case 'g':
+                firstMoveHorizontalView = 7;
+                break;
+            case 'h':
+                firstMoveHorizontalView = 8;
+                break;
+            default:
+                throw new ResponseException("INVALID CHESS MOVE");
+        }
+        int firstMoveVerticalView = -1;
+        if (Character.isDigit(chessMoveString.charAt(1))){
+            firstMoveVerticalView = Character.getNumericValue(chessMoveString.charAt(1));
+        } else {
+            throw new ResponseException("INVALID CHESS MOVE");
+        }
+
+        return new ChessPosition(firstMoveVerticalView, firstMoveHorizontalView);
     }
 
     public String leaveGame() {
@@ -381,14 +409,14 @@ public class ChessClient implements ServerMessageObserver {
                 2. leave - the game
                 3. makeMove <CHESS MOVE> <PROMOTION PIECE> - move a piece
                 4. resign - forfeit the game
-                5. Highlight Legal Moves - of piece
+                5. legalMoves - of piece
                 7. help - with possible commands
                 """;
         } else if (state == State.OBSERVING_GAME){
             return """
                 1. redraw - the board
                 2. leave - the game
-                3. Highlight Legal Moves - of piece
+                3. legalMoves - of piece
                 4. help - with possible commands
                 """;
         } else {
@@ -431,9 +459,9 @@ public class ChessClient implements ServerMessageObserver {
 
             // If currentTeamColor is null, then the client is observing and should see the board as white.
             if (currentTeamColor == null){
-                drawBoard.run(matrix, "WHITE");
+                drawBoard.run(matrix, "WHITE", null);
             } else {
-                drawBoard.run(matrix, currentTeamColor);
+                drawBoard.run(matrix, currentTeamColor, null);
             }
         } catch (Exception ex) {
             System.out.println("Error loading game: " + ex.getMessage());
