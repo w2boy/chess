@@ -11,6 +11,7 @@ import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Set;
 
 public class ChessClient implements ServerMessageObserver {
     private final DrawBoard drawBoard = new DrawBoard();
@@ -18,6 +19,7 @@ public class ChessClient implements ServerMessageObserver {
     private String serverUrl;
     private Repl repl;
     private int currentGameID;
+    private Set<Integer> history;
     private String currentTeamColor;
 
     State state = State.LOGGED_OUT;
@@ -193,6 +195,10 @@ public class ChessClient implements ServerMessageObserver {
         assertLoggedIn();
         if (params.length == 2) {
             int id = Integer.parseInt(params[0]);
+            if (history.contains(id)){
+                state = State.GAME_ENDED;
+                return "";
+            }
             String color = params[1];
             JoinGameRequest joinGameRequest = new JoinGameRequest (color, id);
             JoinGameResult joingameResult = server.joinGame(joinGameRequest, authToken);
@@ -323,12 +329,11 @@ public class ChessClient implements ServerMessageObserver {
     public String resignGame() {
         int id = currentGameID;
         System.out.println("Do you really want to resign the game? If so type YES");
-        try (Scanner scanner = new Scanner(System.in)) {
+            Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             if (line.equals("YES")){
                 server.resignGameWebsocket(authToken, id);
             }
-        }
         return "";
     }
 
@@ -411,6 +416,7 @@ public class ChessClient implements ServerMessageObserver {
         System.out.println(notificationMessage.getMessage());
         if (notificationMessage.getMessage().equals("The game has ended.")){
             state = State.GAME_ENDED;
+            history.add(currentGameID);
         }
     }
 
