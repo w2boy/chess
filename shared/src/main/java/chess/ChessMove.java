@@ -59,7 +59,61 @@ public class ChessMove {
     }
 
     @Override
-    public String toString(){
-        return "{" + startPosition + ", " + endPosition + "}";
+    public String toString() {
+        String startCol = null;
+        String endCol = null;
+        switch (startPosition.getColumn()) {
+            case 1:
+                startCol = "a";
+                break;
+            case 2:
+                startCol = "b";
+                break;
+            case 3:
+                startCol = "c";
+                break;
+            case 4:
+                startCol = "d";
+                break;
+            case 5:
+                startCol = "e";
+                break;
+            case 6:
+                startCol = "f";
+                break;
+            case 7:
+                startCol = "g";
+                break;
+            case 8:
+                startCol = "h";
+                break;
+        }
+        switch (endPosition.getColumn()) {
+            case 1:
+                endCol = "a";
+                break;
+            case 2:
+                endCol = "b";
+                break;
+            case 3:
+                endCol = "c";
+                break;
+            case 4:
+                endCol = "d";
+                break;
+            case 5:
+                endCol = "e";
+                break;
+            case 6:
+                endCol = "f";
+                break;
+            case 7:
+                endCol = "g";
+                break;
+            case 8:
+                endCol = "h";
+                break;
+        }
+        return "{" + startCol + Integer.toString(startPosition.getRow()) + ", " + endCol + Integer.toString(endPosition.getRow()) + "}";
     }
 }

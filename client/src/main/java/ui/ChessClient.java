@@ -10,6 +10,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class ChessClient implements ServerMessageObserver {
     private final DrawBoard drawBoard = new DrawBoard();
@@ -100,6 +101,7 @@ public class ChessClient implements ServerMessageObserver {
             return switch (cmd) {
                 case "redraw" -> loadGame();
                 case "leave" -> leaveGame();
+                case "resign" -> resignGame();
                 case "makeMove" -> makeMove(params);
                 default -> help();
             };
@@ -316,6 +318,18 @@ public class ChessClient implements ServerMessageObserver {
         server.leaveGameWebsocket(authToken, id);
         state = State.LOGGED_IN;
         return String.format("Left Game");
+    }
+
+    public String resignGame() {
+        int id = currentGameID;
+        System.out.println("Do you really want to resign the game? If so type YES");
+        try (Scanner scanner = new Scanner(System.in)) {
+            String line = scanner.nextLine();
+            if (line.equals("YES")){
+                server.resignGameWebsocket(authToken, id);
+            }
+        }
+        return "";
     }
 
     public String observeGame(String... params) throws ResponseException {

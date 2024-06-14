@@ -103,9 +103,14 @@ public class WebsocketRequestHandler {
                     stringToSend = username + " left the game";
                     notifyOtherSessions(session, leaveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
                     break;
-//                case RESIGN:
-//                    resign(session, username, (ResignCommand) command);
-//                    break;
+                case RESIGN:
+                    ResignCommand resignCommand = new Gson().fromJson(msg, ResignCommand.class);
+                    stringToSend = username + " resigned from the game";
+                    sendMessage(session, new NotificationMessage(stringToSend));
+                    notifyOtherSessions(session, resignCommand.getGameID(), username, stringToSend, "NOTIFICATION");
+                    sendMessage(session, new NotificationMessage("The game has ended."));
+                    notifyOtherSessions(session, resignCommand.getGameID(), username, "The game has ended.", "NOTIFICATION");
+                    break;
             }
 
         } catch (Exception ex) {

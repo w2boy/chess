@@ -15,6 +15,7 @@ import server.Server;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
+import websocket.commands.ResignCommand;
 
 public class ServerFacade {
 
@@ -83,6 +84,12 @@ public class ServerFacade {
         var ws = new WebsocketCommunicator(observer);
 
         ws.send(new MakeMoveCommand(authToken, gameID, move));
+    }
+
+    public void resignGameWebsocket(String authToken, int gameID){
+        var ws = new WebsocketCommunicator(observer);
+
+        ws.send(new ResignCommand(authToken, gameID));
     }
 
     public ChessBoard getGameBoard(GetBoardRequest getBoardRequest) throws ResponseException {
