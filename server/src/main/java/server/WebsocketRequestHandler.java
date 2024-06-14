@@ -60,10 +60,10 @@ public class WebsocketRequestHandler {
 //                    break;
                 case LEAVE:
                     LeaveCommand leaveCommand = new Gson().fromJson(msg, LeaveCommand.class);
-                    color = findColor(command.getGameID(), username, session);
-                    leaveGame(command.getGameID(), username, color, session);
+                    color = findColor(leaveCommand.getGameID(), username, session);
+                    leaveGame(leaveCommand.getGameID(), username, color, session);
                     stringToSend = username + " left the game";
-                    notifyOtherSessions(session, command.getGameID(), username, stringToSend);
+                    notifyOtherSessions(session, leaveCommand.getGameID(), username, stringToSend);
                     break;
 //                case RESIGN:
 //                    resign(session, username, (ResignCommand) command);

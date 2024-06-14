@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import model.UserData;
 
@@ -13,6 +14,7 @@ import model.*;
 import server.Server;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
 
 public class ServerFacade {
 
@@ -75,6 +77,12 @@ public class ServerFacade {
         var ws = new WebsocketCommunicator(observer);
 
         ws.send(new LeaveCommand(authToken, gameID));
+    }
+
+    public void makeMoveWebsocket(String authToken, int gameID, ChessMove move){
+        var ws = new WebsocketCommunicator(observer);
+
+        ws.send(new MakeMoveCommand(authToken, gameID, move));
     }
 
     public ChessBoard getGameBoard(GetBoardRequest getBoardRequest) throws ResponseException {

@@ -1,8 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
+import chess.*;
 import com.google.gson.Gson;
 import model.*;
 import model.UserData;
@@ -99,6 +97,7 @@ public class ChessClient implements ServerMessageObserver {
             return switch (cmd) {
                 case "redraw" -> loadGame();
                 case "leave" -> leaveGame();
+                case "makeMove" -> makeMove(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -113,6 +112,7 @@ public class ChessClient implements ServerMessageObserver {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "redraw" -> loadGame();
+                case "leave" -> leaveGame();
                 default -> help();
             };
         } catch (Exception ex) {
@@ -186,6 +186,110 @@ public class ChessClient implements ServerMessageObserver {
         throw new ResponseException("<ID> [WHITE|BLACK]");
     }
 
+    public String makeMove(String... params) throws ResponseException {
+        if (params.length >= 1) {
+            int id = currentGameID;
+            String chessMoveString = params[0];
+            String promotionPieceString = null;
+            if (params[1] != null){
+                promotionPieceString = params[1];
+            }
+            createMove(chessMoveString, promotionPieceString);
+            ChessMove chessMove = null;
+            server.makeMoveWebsocket(authToken, id, chessMove);
+            return "";
+        }
+        throw new ResponseException("makeMove <CHESS MOVE> <PROMOTION PIECE>");
+    }
+
+    public ChessMove createMove(String chessMoveString, String promotionPieceString) throws ResponseException {
+        int firstMoveHorizontalView = -1;
+        switch(chessMoveString.charAt(0)){
+            case 'a':
+                firstMoveHorizontalView = 0;
+                break;
+            case 'b':
+                firstMoveHorizontalView = 1;
+                break;
+            case 'c':
+                firstMoveHorizontalView = 2;
+                break;
+            case 'd':
+                firstMoveHorizontalView = 3;
+                break;
+            case 'e':
+                firstMoveHorizontalView = 4;
+                break;
+            case 'f':
+                firstMoveHorizontalView = 5;
+                break;
+            case 'g':
+                firstMoveHorizontalView = 6;
+                break;
+            case 'h':
+                firstMoveHorizontalView = 7;
+                break;
+            default:
+                throw new ResponseException("INVALID CHESS MOVE");
+        }
+        int firstMoveVerticalView = -1;
+        if (Character.isDigit(chessMoveString.charAt(1))){
+            firstMoveVerticalView = (int) chessMoveString.charAt(1);
+        } else {
+            throw new ResponseException("INVALID CHESS MOVE");
+        }
+        int secondMoveHorizontalView = -1;
+        switch(chessMoveString.charAt(2)){
+            case 'a':
+                secondMoveHorizontalView = 1;
+                break;
+            case 'c':
+                secondMoveHorizontalView = 2;
+                break;
+            case 'd':
+                secondMoveHorizontalView = 3;
+                break;
+            case 'e':
+                secondMoveHorizontalView = 4;
+                break;
+            case 'f':
+                secondMoveHorizontalView = 5;
+                break;
+            case 'g':
+                secondMoveHorizontalView = 6;
+                break;
+            case 'h':
+                secondMoveHorizontalView = 7;
+                break;
+            default:
+                throw new ResponseException("INVALID CHESS MOVE");
+        }
+        int secondMoveVerticalView = -1;
+        if (Character.isDigit(chessMoveString.charAt(3))){
+            secondMoveVerticalView = (int) chessMoveString.charAt(3);
+        } else {
+            throw new ResponseException("INVALID CHESS MOVE");
+        }
+        ChessPiece.PieceType promotionPieceType = null;
+        switch (promotionPieceString){
+            case "QUEEN":
+                promotionPieceType = ChessPiece.PieceType.QUEEN;
+                break;
+            case "ROOK":
+                promotionPieceType = ChessPiece.PieceType.ROOK;
+                break;
+            case "BISHOP":
+                promotionPieceType = ChessPiece.PieceType.BISHOP;
+                break;
+            case "KNIGHT":
+                promotionPieceType = ChessPiece.PieceType.KNIGHT;
+                break;
+        }
+        ChessPosition startPosition = new ChessPosition(firstMoveVerticalView, firstMoveHorizontalView);
+        ChessPosition endPosition = new ChessPosition(secondMoveVerticalView, secondMoveHorizontalView);
+        return new ChessMove(startPosition, endPosition, promotionPieceType);
+    }
+
     public String leaveGame() {
         int id = currentGameID;
         server.leaveGameWebsocket(authToken, id);
@@ -235,7 +339,7 @@ public class ChessClient implements ServerMessageObserver {
             return """
                 1. redraw - the  board
                 2. leave - the game
-                3. Make Move <CHESSMOVE> - move a piece
+                3. makeMove <CHESS MOVE> <PROMOTION PIECE> - move a piece
                 4. resign - forfeit the game
                 5. Highlight Legal Moves - of piece
                 7. help - with possible commands
