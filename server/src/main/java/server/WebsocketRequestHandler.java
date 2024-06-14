@@ -81,11 +81,15 @@ public class WebsocketRequestHandler {
                             stringToSend = oponentUsername + " is checkmated! " + username + " wins!";
                             sendMessage(session, new NotificationMessage(stringToSend));
                             notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
+                            sendMessage(session, new NotificationMessage("The game has ended."));
+                            notifyOtherSessions(session, makeMoveCommand.getGameID(), username, "The game has ended.", "NOTIFICATION");
                         }
                         if (updatedGame.isInStalemate(oponentColor)){
                             stringToSend = "The game is in stalemate. It's a tie!";
                             sendMessage(session, new NotificationMessage(stringToSend));
                             notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
+                            sendMessage(session, new NotificationMessage("The game has ended."));
+                            notifyOtherSessions(session, makeMoveCommand.getGameID(), username, "The game has ended.", "NOTIFICATION");
                         }
                     } else {
                         sendMessage(session, new ErrorMessage("Error: INVALID MOVE"));

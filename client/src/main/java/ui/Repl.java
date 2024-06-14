@@ -48,8 +48,10 @@ public class Repl {
             System.out.print("\n" + "Logged In" + " >>> ");
         } else if (client.state == State.PLAYING_GAME){
             System.out.print("\n" + "Playing Game" + " >>> ");
-        } else {
+        } else if (client.state == State.OBSERVING_GAME){
             System.out.print("\n" + "Observing Game" + " >>> ");
+        } else {
+            System.out.print("\n" + "Game Ended (No more moves can be made.)" + " >>> ");
         }
 
     }

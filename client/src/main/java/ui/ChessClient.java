@@ -49,9 +49,12 @@ public class ChessClient implements ServerMessageObserver {
         else if (state == State.PLAYING_GAME) {
             return evalPlayingGame(input);
         }
-        else {
+        else if (state == State.OBSERVING_GAME) {
             return evalObservingGame(input);
+        } else {
+            return evalGameEnded(input);
         }
+
     }
 
     public String evalLoggedOut(String input) {
@@ -112,6 +115,20 @@ public class ChessClient implements ServerMessageObserver {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "redraw" -> loadGame();
+                case "leave" -> leaveGame();
+                default -> help();
+            };
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
+    }
+
+    public String evalGameEnded(String input) {
+        try {
+            var tokens = input.split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
                 case "leave" -> leaveGame();
                 default -> help();
             };
@@ -348,12 +365,17 @@ public class ChessClient implements ServerMessageObserver {
                 5. Highlight Legal Moves - of piece
                 7. help - with possible commands
                 """;
-        } else {
+        } else if (state == State.OBSERVING_GAME){
             return """
                 1. redraw - the board
                 2. leave - the game
                 3. Highlight Legal Moves - of piece
                 4. help - with possible commands
+                """;
+        } else {
+            return """
+                1. leave - the game
+                2. help - with possible commands
                 """;
         }
 
@@ -373,6 +395,9 @@ public class ChessClient implements ServerMessageObserver {
 
     private void displayNotification(NotificationMessage notificationMessage) {
         System.out.println(notificationMessage.getMessage());
+        if (notificationMessage.getMessage().equals("The game has ended.")){
+            state = State.GAME_ENDED;
+        }
     }
 
     private void displayError(ErrorMessage errorMessage) {
