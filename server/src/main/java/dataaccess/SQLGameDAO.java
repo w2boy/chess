@@ -204,4 +204,26 @@ public class SQLGameDAO {
         }
         return null;
     }
+
+    public void leaveGame(int gameID, String username, String color) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = null;
+            if (color.equals("white")){
+                statement = "update game_table " +
+                        "set white_username=?" +
+                        "where white_username=?";
+            }
+            else if (color.equals("black")){
+                statement = "UPDATE game_table " +
+                        "SET black_username=?" +
+                        "WHERE black_username=?";
+            }
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, null);
+                ps.setString(2, username);
+            }
+        } catch (Exception e) {
+            throw new DataAccessException (String.format("Unable to read data: %s", e.getMessage()));
+        }
+    }
 }

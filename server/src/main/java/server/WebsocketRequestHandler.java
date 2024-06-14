@@ -22,7 +22,7 @@ public class WebsocketRequestHandler {
     SQLGameDAO sqlGameDAO;
 
     Map<Integer, Set<Session>> sessionMap = new HashMap<>();
-    Map<Integer, String> usernameMap = new HashMap<>();
+    Map<Session, String> usernameMap = new HashMap<>();
 
     WebsocketRequestHandler() {}
 
@@ -41,8 +41,6 @@ public class WebsocketRequestHandler {
         try {
             UserGameCommand command = new Gson().fromJson(msg, UserGameCommand.class);
 
-            UserGameCommand.CommandType commandType =  command.getCommandType();
-
             String username = sqlAuthDAO.getUsername(command.getAuthString());
 
             switch (command.getCommandType()) {
@@ -50,16 +48,23 @@ public class WebsocketRequestHandler {
                     ConnectCommand connectCommand = new Gson().fromJson(msg, ConnectCommand.class);
                     // Associate the username with a gameID and a session.
                     saveSession(command.getGameID(), session);
-                    saveUsernameToGame(command.getGameID(), username);
+                    saveUsernameToGame(username, session);
                     color = findColor(command.getGameID(), username, session);
-                    connect(session, command.getGameID(), username, color, connectCommand);
+
+                    sendMessage(session, new LoadGameMessage("game"));
+                    String stringToSend = username + " joined the game as " + color;
+                    notifyOtherSessions(session, command.getGameID(), username, stringToSend);
                     break;
 //                case MAKE_MOVE:
 //                    makeMove(session, username, (MakeMoveCommand) command);
 //                    break;
-//                case LEAVE:
-//                    leaveGame(session, username, (LeaveGameCommand) command);
-//                    break;
+                case LEAVE:
+                    LeaveCommand leaveCommand = new Gson().fromJson(msg, LeaveCommand.class);
+                    color = findColor(command.getGameID(), username, session);
+                    leaveGame(command.getGameID(), username, color, session);
+                    stringToSend = username + " left the game";
+                    notifyOtherSessions(session, command.getGameID(), username, stringToSend);
+                    break;
 //                case RESIGN:
 //                    resign(session, username, (ResignCommand) command);
 //                    break;
@@ -90,9 +95,8 @@ public class WebsocketRequestHandler {
         sessionMap.get(gameID).add(session);
     }
 
-    void saveUsernameToGame(int gID, String username){
-        Integer gameID = gID;
-        usernameMap.put(gameID, username);
+    void saveUsernameToGame(String username, Session session){
+        usernameMap.put(session, username);
     }
 
     String findColor(int gameID, String username, Session session){
@@ -116,16 +120,27 @@ public class WebsocketRequestHandler {
         return color;
     }
 
-    void connect(Session session, Integer gameID, String username, String color, ConnectCommand connectCommand){
-        sendMessage(session, new LoadGameMessage("game"));
+    void leaveGame(int gameID, String username, String color, Session session){
+        try{
+            if (!color.equals("observer")){
+                sqlGameDAO.leaveGame(gameID, username, color);
+            }
+            sessionMap.get(gameID).remove(session);
+        } catch (Exception ex){
+            ex.printStackTrace();
+            sendMessage(session, new ErrorMessage("Error leaving game on Server Side: " + ex.getMessage()));
+        }
+    }
+
+    void notifyOtherSessions(Session session, Integer gameID, String username, String stringToSend){
 
         // Cycle through the maps and send notifications to other sessions in game.
         for (Map.Entry<Integer, Set<Session>> entry : sessionMap.entrySet()) {
             if (entry.getKey().equals(gameID)) {
                 Set<Session> sessionsInGame = entry.getValue();
                 for (Session otherSession : sessionsInGame){
-                    if(otherSession != session){
-                        String stringToSend = username + " joined the game as " + color;
+                    String otherUsername = usernameMap.get(otherSession);
+                    if(!otherUsername.equals(username)){
                         sendMessage(otherSession, new NotificationMessage(stringToSend));
                     }
                 }

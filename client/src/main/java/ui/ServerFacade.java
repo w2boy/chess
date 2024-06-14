@@ -12,6 +12,7 @@ import java.util.Scanner;
 import model.*;
 import server.Server;
 import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
 
 public class ServerFacade {
 
@@ -68,6 +69,12 @@ public class ServerFacade {
         var ws = new WebsocketCommunicator(observer);
 
         ws.send(new ConnectCommand(authToken, gameID));
+    }
+
+    public void leaveGameWebsocket(String authToken, int gameID){
+        var ws = new WebsocketCommunicator(observer);
+
+        ws.send(new LeaveCommand(authToken, gameID));
     }
 
     public ChessBoard getGameBoard(GetBoardRequest getBoardRequest) throws ResponseException {

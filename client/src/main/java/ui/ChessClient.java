@@ -98,6 +98,7 @@ public class ChessClient implements ServerMessageObserver {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "redraw" -> loadGame();
+                case "leave" -> leaveGame();
                 default -> help();
             };
         } catch (Exception ex) {
@@ -185,6 +186,13 @@ public class ChessClient implements ServerMessageObserver {
         throw new ResponseException("<ID> [WHITE|BLACK]");
     }
 
+    public String leaveGame() {
+        int id = currentGameID;
+        server.leaveGameWebsocket(authToken, id);
+        state = State.LOGGED_IN;
+        return String.format("Left Game");
+    }
+
     public String observeGame(String... params) throws ResponseException {
         assertLoggedIn();
         if (params.length == 1) {
@@ -203,13 +211,6 @@ public class ChessClient implements ServerMessageObserver {
         authToken = null;
         state = State.LOGGED_OUT;
         return String.format("You are logged out");
-    }
-
-    public String redrawGameBoard() throws ResponseException {
-        ChessBoard chessBoard = server.getGameBoard(new GetBoardRequest(currentGameID));
-        ChessPiece[][] matrix = chessBoard.squares;
-        drawBoard.run(matrix, currentTeamColor);
-        return ("Redrew Board");
     }
 
     public String help(){
