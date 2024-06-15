@@ -169,18 +169,22 @@ public class WebsocketRequestHandler {
             if (gameData == null){
                 throw new Exception("INVALID GAME ID");
             }
+            if (gameData.whiteUsername() != null){
                 if (gameData.whiteUsername().equals(username)){
                     color = "white";
                     playerColor = ChessGame.TeamColor.WHITE;
                     oponentColor = ChessGame.TeamColor.BLACK;
                     oponentUsername = gameData.blackUsername();
                 }
+            }
+            if (gameData.blackUsername() != null){
                 if (gameData.blackUsername().equals(username)){
                     color = "black";
                     playerColor = ChessGame.TeamColor.BLACK;
                     oponentColor = ChessGame.TeamColor.WHITE;
                     oponentUsername = gameData.whiteUsername();
                 }
+            }
         return color;
     }
 
