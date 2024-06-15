@@ -1,11 +1,9 @@
 package ui;
 
 import chess.*;
-import com.google.gson.Gson;
 import model.*;
 import model.UserData;
 import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 

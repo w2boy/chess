@@ -3,16 +3,9 @@ package ui;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
-import com.google.gson.Gson;
 import model.UserData;
 
-import java.io.*;
-import java.net.*;
-import java.util.List;
-import java.util.Scanner;
-
 import model.*;
-import server.Server;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
