@@ -26,6 +26,7 @@ public class WebsocketRequestHandler {
 
     Map<Integer, Set<Session>> sessionMap = new HashMap<>();
     Map<Session, String> usernameMap = new HashMap<>();
+    Map<String, Session> usernameMapFlipped = new HashMap<>();
     Map<Session, String> resignMap = new HashMap<>();
 
     WebsocketRequestHandler() {}
@@ -67,7 +68,7 @@ public class WebsocketRequestHandler {
                     }
                 case MAKE_MOVE:
                     MakeMoveCommand makeMoveCommand = new Gson().fromJson(msg, MakeMoveCommand.class);
-                    if (userResigned(username, session)){
+                    if (resignMap.isEmpty()){
                         sendMessage(session, new ErrorMessage("Error: Can no longer make moves"));
                         break;
                     }
@@ -115,7 +116,7 @@ public class WebsocketRequestHandler {
                         sendMessage(session, new ErrorMessage("Error: You can't resign."));
                         break;
                     }
-                    if (userResigned(username, session)){
+                    if (resignMap.isEmpty()){
                         sendMessage(session, new ErrorMessage("Error: You can't resign."));
                         break;
                     }
@@ -154,18 +155,12 @@ public class WebsocketRequestHandler {
 
     void saveUsernameToGame(String username, Session session){
         usernameMap.put(session, username);
+        usernameMapFlipped.put(username, session);
         resignMap.put(session, username);
     }
 
     void removeUsernameFromGame(){
         resignMap.clear();
-    }
-
-    boolean userResigned(String username, Session session){
-        if (resignMap.containsKey(session)){
-            return false;
-        }
-        return true;
     }
 
     String findColor(int gameID, String username, Session session) throws Exception {
@@ -221,7 +216,8 @@ public class WebsocketRequestHandler {
             if (!color.equals("observer")){
                 sqlGameDAO.leaveGame(gameID, username, color);
             }
-            sessionMap.get(gameID).remove(session);
+            Session sessionToRemove = usernameMapFlipped.get(username);
+            usernameMap.remove(sessionToRemove);
         } catch (Exception ex){
             ex.printStackTrace();
             sendMessage(session, new ErrorMessage("Error leaving game on Server Side: " + ex.getMessage()));
@@ -236,7 +232,7 @@ public class WebsocketRequestHandler {
                 Set<Session> sessionsInGame = entry.getValue();
                 for (Session otherSession : sessionsInGame){
                     String otherUsername = usernameMap.get(otherSession);
-                    if(!otherUsername.equals(username)){
+                    if(otherUsername != null && !otherUsername.equals(username)){
                         if (messageType.equals("NOTIFICATION")){
                             sendMessage(otherSession, new NotificationMessage(stringToSend));
                         } else if (messageType.equals("LOADGAME")){
