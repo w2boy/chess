@@ -144,7 +144,7 @@ public class DrawBoard {
                         setBlack(out);
                     }
 
-                    if (validMoves != null && validMoveSpace(new ChessPosition(squareRow+1, boardCol+1), validMoves)){
+                    if (validMoves != null && validMoveSpace(new ChessPosition(verticleView+1, horizonotalView+1), validMoves)){
                         setBlue(out);
                     }
 
@@ -160,7 +160,7 @@ public class DrawBoard {
                         setWhite(out);
                     }
 
-                    if (validMoves != null && validMoveSpace(new ChessPosition(squareRow+1, boardCol+1), validMoves)){setBlue(out);}
+                    if (validMoves != null && validMoveSpace(new ChessPosition(verticleView+1, horizonotalView+1), validMoves)){setBlue(out);}
 
                     out.print(" ");
                     out.print(type);
@@ -176,8 +176,10 @@ public class DrawBoard {
 
     public static boolean validMoveSpace(ChessPosition spacePosition, Collection<ChessMove> validMoves){
         for (ChessMove validMove : validMoves){
-            if (validMove.getStartPosition() == spacePosition){
-                return true;
+            if (validMove.getEndPosition().getRow() == spacePosition.getRow()){
+                if (validMove.getEndPosition().getColumn() == spacePosition.getColumn()){
+                    return true;
+                }
             }
         }
         return false;
