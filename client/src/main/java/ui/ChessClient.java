@@ -68,7 +68,7 @@ public class ChessClient implements ServerMessageObserver {
                 default -> help();
             };
         } catch (ResponseException ex) {
-            return ex.getMessage();
+            return catchError(ex);
         }
     }
 
@@ -87,8 +87,21 @@ public class ChessClient implements ServerMessageObserver {
                 default -> help();
             };
         } catch (ResponseException ex) {
-            return ex.getMessage();
+            return catchError(ex);
         }
+    }
+
+    private String catchError(Exception ex){
+        if (ex.getMessage().equals("failure: 400")){
+            return "Error: bad request";
+        }
+        if (ex.getMessage().equals("failure: 401")){
+            return "Error: unauthorized";
+        }
+        if (ex.getMessage().equals("failure: 403")){
+            return "Error: already taken";
+        }
+        return ex.getMessage();
     }
 
     public String evalPlayingGame(String input) {
@@ -181,12 +194,15 @@ public class ChessClient implements ServerMessageObserver {
     public String listGames() throws ResponseException {
         assertLoggedIn();
         ListGamesResult listGamesResult = server.listGames(authToken);
-        var result = new StringBuilder();
+        String listGamesString = "";
         for (var game : listGamesResult.games()) {
             ListGamesOutput listGamesOutput = new ListGamesOutput(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName());
-            result.append(listGamesOutput).append('\n');
+            listGamesString += Integer.toString(game.gameID()) + ". Name: " + game.gameName() + "\n" +
+                    "White Username: " + game.whiteUsername() + "\n" +
+                    "Black Username: " + game.blackUsername() + "\n";
         }
-        return result.toString();
+
+        return listGamesString;
     }
 
     public String joinGame(String... params) throws ResponseException {
