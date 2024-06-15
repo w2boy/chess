@@ -34,7 +34,4 @@ public class UserService {
         return new LogoutResult("Error: unauthorized");
     }
 
-//    public String getUsername(SQLUserDAO userDAO){
-//        userDAO.getUsername()
-//    }
 }
