@@ -9,10 +9,7 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class ChessClient implements ServerMessageObserver {
     private final DrawBoard drawBoard = new DrawBoard();
@@ -20,7 +17,7 @@ public class ChessClient implements ServerMessageObserver {
     private String serverUrl;
     private Repl repl;
     private int currentGameID;
-    private Set<Integer> history;
+    private Set<Integer> history = new HashSet<>();
     private String currentTeamColor;
 
     State state = State.LOGGED_OUT;
@@ -442,7 +439,8 @@ public class ChessClient implements ServerMessageObserver {
 
     private void displayNotification(NotificationMessage notificationMessage) {
         System.out.println(notificationMessage.getMessage());
-        if (notificationMessage.getMessage().equals("The game has ended.")){
+        String message = notificationMessage.getMessage();
+        if (message.substring(message.length() - 1).equals("!")){
             state = State.GAME_ENDED;
             history.add(currentGameID);
         }

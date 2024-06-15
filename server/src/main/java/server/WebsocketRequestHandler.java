@@ -26,6 +26,7 @@ public class WebsocketRequestHandler {
 
     Map<Integer, Set<Session>> sessionMap = new HashMap<>();
     Map<Session, String> usernameMap = new HashMap<>();
+    Map<Session, String> resignMap = new HashMap<>();
 
     WebsocketRequestHandler() {}
 
@@ -46,24 +47,34 @@ public class WebsocketRequestHandler {
 
             String username = sqlAuthDAO.getUsername(command.getAuthString());
 
+            String stringToSend = "";
+
             switch (command.getCommandType()) {
                 case CONNECT:
-                    ConnectCommand connectCommand = new Gson().fromJson(msg, ConnectCommand.class);
-                    // Associate the username with a gameID and a session.
-                    saveSession(command.getGameID(), session);
-                    saveUsernameToGame(username, session);
-                    color = findColor(command.getGameID(), username, session);
-
-                    sendMessage(session, new LoadGameMessage("game"));
-                    String stringToSend = username + " joined the game as " + color;
-                    notifyOtherSessions(session, command.getGameID(), username, stringToSend, "NOTIFICATION");
-                    break;
+                    try{
+                        ConnectCommand connectCommand = new Gson().fromJson(msg, ConnectCommand.class);
+                        // Associate the username with a gameID and a session.
+                        saveSession(command.getGameID(), session);
+                        saveUsernameToGame(username, session);
+                        color = findColor(command.getGameID(), username, session);
+                        sendMessage(session, new LoadGameMessage("game"));
+                        stringToSend = username + " joined the game as " + color;
+                        notifyOtherSessions(session, command.getGameID(), username, stringToSend, "NOTIFICATION");
+                        break;
+                    } catch (Exception ex){
+                        sendMessage(session, new ErrorMessage("INVALID ID"));
+                        break;
+                    }
                 case MAKE_MOVE:
                     MakeMoveCommand makeMoveCommand = new Gson().fromJson(msg, MakeMoveCommand.class);
+                    if (userResigned(username, session)){
+                        sendMessage(session, new ErrorMessage("Error: Can no longer make moves"));
+                        break;
+                    }
                     GameData gameData = sqlGameDAO.getGame(makeMoveCommand.getGameID());
                     findColor(command.getGameID(), username, session);
                     if (!verifyTurn(gameData.game())){
-                        sendMessage(session, new ErrorMessage("Error: Not Your Turn!"));
+                        sendMessage(session, new ErrorMessage("Error: Not Your Turn."));
                         break;
                     }
                     // If the move is valid make the move and check for endgame conditions. If any endgame conditions, notify other sessions
@@ -72,24 +83,20 @@ public class WebsocketRequestHandler {
                         sendMessage(session, new LoadGameMessage("game"));
                         stringToSend = username + " made the move " + makeMoveCommand.getChessMove().toString();
                         notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "LOADGAME");
-                        if (updatedGame.isInCheck(oponentColor)){
-                            stringToSend = oponentUsername + " is in check!";
+                        if (updatedGame.isInCheckmate(oponentColor)){
+                            stringToSend = oponentUsername + " is checkmated! " + username + " wins! The game has ended!";
                             sendMessage(session, new NotificationMessage(stringToSend));
                             notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
                         }
-                        if (updatedGame.isInCheckmate(oponentColor)){
-                            stringToSend = oponentUsername + " is checkmated! " + username + " wins!";
+                        else if (updatedGame.isInCheck(oponentColor)){
+                            stringToSend = oponentUsername + " is in check.";
                             sendMessage(session, new NotificationMessage(stringToSend));
                             notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
-                            sendMessage(session, new NotificationMessage("The game has ended."));
-                            notifyOtherSessions(session, makeMoveCommand.getGameID(), username, "The game has ended.", "NOTIFICATION");
                         }
                         if (updatedGame.isInStalemate(oponentColor)){
-                            stringToSend = "The game is in stalemate. It's a tie!";
+                            stringToSend = "The game is in stalemate. It's a tie! The game has ended!";
                             sendMessage(session, new NotificationMessage(stringToSend));
                             notifyOtherSessions(session, makeMoveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
-                            sendMessage(session, new NotificationMessage("The game has ended."));
-                            notifyOtherSessions(session, makeMoveCommand.getGameID(), username, "The game has ended.", "NOTIFICATION");
                         }
                     } else {
                         sendMessage(session, new ErrorMessage("Error: INVALID MOVE"));
@@ -104,12 +111,19 @@ public class WebsocketRequestHandler {
                     notifyOtherSessions(session, leaveCommand.getGameID(), username, stringToSend, "NOTIFICATION");
                     break;
                 case RESIGN:
+                    if (username.equals("observer")){
+                        sendMessage(session, new ErrorMessage("Error: You can't resign."));
+                        break;
+                    }
+                    if (userResigned(username, session)){
+                        sendMessage(session, new ErrorMessage("Error: You can't resign."));
+                        break;
+                    }
                     ResignCommand resignCommand = new Gson().fromJson(msg, ResignCommand.class);
-                    stringToSend = username + " resigned from the game";
+                    removeUsernameFromGame();
+                    stringToSend = username + " resigned from the game. The game has ended!";
                     sendMessage(session, new NotificationMessage(stringToSend));
                     notifyOtherSessions(session, resignCommand.getGameID(), username, stringToSend, "NOTIFICATION");
-                    sendMessage(session, new NotificationMessage("The game has ended."));
-                    notifyOtherSessions(session, resignCommand.getGameID(), username, "The game has ended.", "NOTIFICATION");
                     break;
             }
 
@@ -140,12 +154,26 @@ public class WebsocketRequestHandler {
 
     void saveUsernameToGame(String username, Session session){
         usernameMap.put(session, username);
+        resignMap.put(session, username);
     }
 
-    String findColor(int gameID, String username, Session session){
+    void removeUsernameFromGame(){
+        resignMap.clear();
+    }
+
+    boolean userResigned(String username, Session session){
+        if (resignMap.containsKey(session)){
+            return false;
+        }
+        return true;
+    }
+
+    String findColor(int gameID, String username, Session session) throws Exception {
         String color = "observer";
-        try {
             GameData gameData = sqlGameDAO.getGame(gameID);
+            if (gameData == null){
+                throw new Exception("INVALID GAME ID");
+            }
                 if (gameData.whiteUsername().equals(username)){
                     color = "white";
                     playerColor = ChessGame.TeamColor.WHITE;
@@ -158,10 +186,6 @@ public class WebsocketRequestHandler {
                     oponentColor = ChessGame.TeamColor.WHITE;
                     oponentUsername = gameData.whiteUsername();
                 }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            sendMessage(session, new ErrorMessage("Error: " + ex.getMessage()));
-        }
         return color;
     }
 
